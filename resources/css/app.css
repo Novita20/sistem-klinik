@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Gaya custom tambahan */
+.hero {
+    background: linear-gradient(to right, #007bff, #00c6ff);
+    border-radius: 0 0 80px 80px;
+}
+
+/* Reset margin dan padding untuk body */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif; /* Anda bisa menambahkan font default di sini */
+}
