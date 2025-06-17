@@ -18,6 +18,7 @@ class User extends Authenticatable
         'password',
         'role',
         'status',
+        'profile_picture',
     ];
 
     protected $hidden = [
@@ -44,7 +45,7 @@ class User extends Authenticatable
 
     public function pasien()
     {
-        return $this->hasOne(Pasien::class);
+        return $this->hasOne(Pasien::class, 'user_id');
     }
 
     public function kunjunganSebagaiPasien()

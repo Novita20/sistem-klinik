@@ -16,6 +16,7 @@ class ResepObat extends Model
         'obat_id',
         'jumlah',
         'keterangan',
+        'pasien_id',
     ];
 
     /**

@@ -21,7 +21,7 @@ class Kunjungan extends Model
     // Relasi ke user sebagai pasien
     public function pasien()
     {
-        return $this->belongsTo(User::class, 'pasien_id');
+        return $this->belongsTo(Pasien::class, 'pasien_id'); // ✅ Benar
     }
 
     // Relasi ke user sebagai paramedis

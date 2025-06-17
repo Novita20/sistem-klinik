@@ -2,10 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogObat;
 use Illuminate\Http\Request;
 
 class LogObatController extends Controller
 {
+    public function mutasi(Request $request)
+    {
+        $query = LogObat::with('obat')->orderBy('tgl_transaksi', 'desc');
+
+        if ($request->filled('search')) {
+            $query->whereHas('obat', function ($q) use ($request) {
+                $q->where('nama_obat', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $logObat = $query->paginate(10);
+
+        return view('paramedis.mutasi.index', compact('logObat'));
+    }
     /**
      * Display a listing of the resource.
      */

@@ -2,63 +2,70 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Obat;
+use App\Models\Pasien;
+use App\Models\RekamMedis;
+use App\Models\ResepObat;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ResepObatController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
+    // 🧾 Paramedis: Tampilkan form input resep
     public function create()
     {
-        //
+        $rekamMedis = RekamMedis::with('pasien')->get();
+        $obats = Obat::all();
+
+        return view('paramedis.create_resep', compact('rekamMedis', 'obats'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // 👩‍⚕️ Pasien: Melihat resep obat miliknya
+    public function index()
+    {
+        $user = Auth::user();
+        $pasien = Pasien::where('user_id', $user->id)->first();
+
+        if (!$pasien) {
+            return redirect()->back()->with('error', 'Data pasien tidak ditemukan.');
+        }
+
+        $reseps = ResepObat::where('pasien_id', $pasien->id)->get();
+
+        return view('pasien.resep', compact('reseps'));
+    }
+
+    // 💾 Paramedis: Simpan resep baru
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'rekam_medis_id' => 'required|exists:rekam_medis,id',
+            'obat_id' => 'required|exists:obat,id',
+            'jumlah' => 'required|integer|min:1',
+            'keterangan' => 'nullable|string',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        // Kurangi stok obat
+        $obat = Obat::findOrFail($request->obat_id);
+        if ($request->jumlah > $obat->stok) {
+            return back()->withErrors(['jumlah' => 'Jumlah melebihi stok obat']);
+        }
+        $obat->stok -= $request->jumlah;
+        $obat->save();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        // Ambil pasien_id dari rekam medis
+        $rekamMedis = RekamMedis::findOrFail($request->rekam_medis_id);
+        $pasienId = $rekamMedis->pasien_id;
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        // Simpan resep
+        ResepObat::create([
+            'rekam_medis_id' => $request->rekam_medis_id,
+            'obat_id' => $request->obat_id,
+            'jumlah' => $request->jumlah,
+            'keterangan' => $request->keterangan,
+            'pasien_id' => $pasienId, // tambahkan pasien_id di sini
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return back()->with('success', 'Resep berhasil disimpan');
     }
 }

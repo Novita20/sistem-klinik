@@ -2,63 +2,69 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogObat;
+use App\Models\Obat;
 use Illuminate\Http\Request;
 
 class ObatController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // Menampilkan semua data obat + search & pagination
+    // Tampilkan halaman list obat
+    public function index(Request $request)
     {
-        //
+        $query = Obat::query();
+
+        if ($request->filled('search')) {
+            $query->where('nama_obat', 'like', '%' . $request->search . '%');
+        }
+
+        $obats = $query->orderBy('nama_obat')->paginate(10);
+
+        // PANGGIL VIEW SESUAI PATH
+        return view('paramedis.obat.index', compact('obats'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    // Tampilkan form input obat
     public function create()
     {
-        //
+        // PANGGIL VIEW SESUAI PATH
+        return view('paramedis.obat.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'nama_obat'   => 'required|string|max:255',
+            'jenis_obat'  => 'required|string|max:255',
+            'stok'        => 'required|integer|min:0',
+            'satuan'      => 'required|string|max:50',
+            'expired_at'  => 'required|date',
+        ]);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
+        // Simpan obat
+        $obat = Obat::create($request->all());
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        // Catat ke mutasi (log_obat)
+        LogObat::create([
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+            'obat_id'       => $obat->id,
+            'jenis_mutasi'  => 'masuk',
+            'jumlah'        => $obat->stok,
+            'sisa_stok'     => $obat->stok,
+            'tgl_transaksi' => now(),
+            'tgl_exp'       => $obat->expired_at,
+            'keterangan'    => 'Input awal obat',
+            'ref_type'      => 'obat',
+            'ref_id'        => $obat->id,
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return redirect()->route('obat.index')->with('success', 'Data obat berhasil disimpan.');
     }
+    // // Menampilkan log mutasi obat
+    // public function mutasi()
+    // {
+    //     $logObat = LogObat::with('obat')->orderBy('tgl_transaksi', 'desc')->get();
+    //     return view('paramedis.mutasi_obat', compact('logObat'));
+    // }
 }

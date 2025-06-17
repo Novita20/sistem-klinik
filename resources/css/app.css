@@ -14,3 +14,17 @@ body {
     padding: 0;
     font-family: Arial, sans-serif; /* Anda bisa menambahkan font default di sini */
 }
+
+.navbar {
+    background-color: #123456 !important;
+}
+
+body.layout-fixed .main-sidebar {
+    height: 100vh !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 1030 !important;
+    overflow-y: auto !important;
+}
+

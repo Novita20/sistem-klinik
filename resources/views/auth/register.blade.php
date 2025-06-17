@@ -1,71 +1,89 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<!doctype html>
+<html lang="en">
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="'Name'" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required
-                autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Register</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/dist/css/login-style.css') }}">
+</head>
+
+<body>
+    <div class="content-wrapper">
+        <img src="{{ asset('assets/dist/img/pltu.jpg') }}" class="background-image" alt="Background PLTU">
+
+        <div class="overlay">
+            <div class="form-wrapper text-center">
+                <img src="{{ asset('assets/dist/img/pln.png') }}" class="mb-3" style="width: 120px;">
+                <h2 class="mb-2">Buat Akun Baru 📝</h2>
+                <p class="mb-4">Silakan isi data Anda untuk mendaftar</p>
+
+                <!-- Alert messages -->
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
+
+                    <div class="mb-3">
+                        <input type="text" name="name" class="form-control" placeholder="Nama"
+                            value="{{ old('name') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="text" name="username" class="form-control" placeholder="Username"
+                            value="{{ old('username') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="email" name="email" class="form-control" placeholder="Email"
+                            value="{{ old('email') }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" name="password" class="form-control" placeholder="Password" required>
+                    </div>
+                    <div class="mb-3">
+                        <input type="password" name="password_confirmation" class="form-control"
+                            placeholder="Konfirmasi Password" required>
+                    </div>
+                    <div class="mb-3">
+                        <select name="role" class="form-control" required>
+                            <option value="" disabled selected>Pilih Role</option>
+                            <option value="pasien">Pasien</option>
+                            <option value="dokter">Dokter</option>
+                            <option value="paramedis">Paramedis</option>
+                            <option value="sdm">SDM</option>
+                            <option value="k3">K3</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Daftar</button>
+
+                    <div class="mt-3">
+                        <a href="{{ route('login') }}" class="text-sm text-gray-600 hover:text-gray-900">Sudah punya
+                            akun?</a>
+                    </div>
+
+                    <div class="mt-3">
+                        <a href="{{ url('/') }}" class="btn btn-secondary btn-sm">← Kembali ke Home</a>
+                    </div>
+                </form>
+            </div>
         </div>
-        <!-- Username -->
-        <div class="mt-4">
-            <x-input-label for="username" :value="'Username'" />
-            <x-text-input id="username" class="block mt-1 w-full" type="text" name="username" :value="old('username')"
-                required autocomplete="username" />
-            <x-input-error :messages="$errors->get('username')" class="mt-2" />
-        </div>
+    </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="'Email'" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')"
-                required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="'Password'" />
-
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required
-                autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="'Confirm Password'" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full" type="password"
-                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-        <div class="mt-4">
-            <x-input-label for="role" :value="'Role'" />
-            <select id="role" name="role" class="block mt-1 w-full" required>
-                <option value="pasien">Pasien</option>
-                <option value="dokter">Dokter</option>
-                <option value="admin">Paramedis</option>
-                <option value="admin">SDM</option>
-                <option value="admin">K3</option>
-            </select>
-            <x-input-error :messages="$errors->get('role')" class="mt-2" />
-        </div>
-
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+</html>
