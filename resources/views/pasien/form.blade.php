@@ -17,13 +17,21 @@
                 <label class="block text-gray-700 font-semibold">Nama</label>
                 <input type="text" name="nama" value="{{ old('nama', $pasien->user->name ?? '') }}"
                     class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500">
+                @error('nama')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
+
 
             {{-- Tanggal Lahir --}}
             <div class="mb-4">
                 <label class="block text-gray-700 font-semibold">Tanggal Lahir</label>
                 <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $pasien->tanggal_lahir ?? '') }}"
                     class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500">
+                @error('tanggal_lahir')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+
             </div>
 
             {{-- Jenis Kelamin --}}
@@ -40,6 +48,10 @@
                         Perempuan</option>
 
                 </select>
+                @error('jenis_kelamin')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+
             </div>
             {{-- Tanggal dan Waktu Kunjungan --}}
             <div class="mb-4">
@@ -47,6 +59,10 @@
                 <input type="datetime-local" name="tgl_kunjungan" value="{{ old('tgl_kunjungan') }}"
                     class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
                     required>
+                @error('tgl_kunjungan')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+
             </div>
 
 
@@ -56,6 +72,10 @@
                 <textarea name="keluhan" rows="4" required
                     class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500">{{ old('keluhan') }}</textarea>
             </div>
+            @error('keluhan')
+                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+            @enderror
+
 
             {{-- Submit --}}
             <div class="flex justify-end">

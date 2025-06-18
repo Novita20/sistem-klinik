@@ -1,39 +1,41 @@
 @extends('layouts.main')
 
-@section('content-header')
-    <div class="p-4">
-        <h1 class="text-2xl font-bold">Riwayat Kunjungan</h1>
-    </div>
-@endsection
-
 @section('content')
-    <div class="p-6">
-        @if (session('error'))
-            <div class="mb-4 text-red-600 font-semibold">
-                {{ session('error') }}
-            </div>
+    <div class="container mt-4">
+        <h3 class="mb-4">📋 Riwayat Kunjungan Anda</h3>
+
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @elseif (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
         @if ($riwayat->isEmpty())
-            <p class="text-gray-600">Belum ada riwayat kunjungan.</p>
+            <div class="alert alert-info">Belum ada riwayat kunjungan.</div>
         @else
-            <table class="w-full table-auto border-collapse border border-gray-300">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th class="border px-4 py-2">Tanggal Kunjungan</th>
-                        <th class="border px-4 py-2">Keluhan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($riwayat as $item)
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
                         <tr>
-                            <td class="border px-4 py-2">
-                                {{ \Carbon\Carbon::parse($item->tgl_kunjungan)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
-                            <td class="border px-4 py-2">{{ $item->keluhan }}</td>
+                            <th>Tanggal</th>
+                            <th>Poli</th>
+                            <th>Dokter</th>
+                            <th>Status</th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($riwayat as $kunjungan)
+                            <tr>
+                                <td>{{ \Carbon\Carbon::parse($kunjungan->waktu_kunjungan)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
+                                </td>
+                                <td>{{ $kunjungan->poli->nama ?? '-' }}</td>
+                                <td>{{ $kunjungan->dokter->name ?? '-' }}</td>
+                                <td>{{ ucfirst($kunjungan->status) }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         @endif
     </div>
 @endsection

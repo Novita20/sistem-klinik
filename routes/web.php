@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\DokterPasienController;
 use App\Http\Controllers\DokterRekamMedisController;
 use App\Http\Controllers\DokterResepController;
@@ -37,6 +39,14 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/register', [RegisterController::class, 'showRegisterForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
+
+
+    //Forgot password
+    Route::get('forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+    Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+    Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 });
 
 
@@ -169,3 +179,21 @@ Route::middleware('auth')->group(function () {
     // 📋 LAPORAN PENGGUNAAN OBAT (K3)
     Route::get('/k3/obat', [K3RestockController::class, 'laporan'])->name('k3.obat');
 });
+
+Route::get('/debug-mail', function () {
+    return config('mail.mailers.smtp');
+});
+
+
+
+// use App\Models\User;
+// use Illuminate\Support\Facades\Hash;
+
+// Route::get('/reset-password-nid', function () {
+//     foreach (User::all() as $user) {
+//         $user->password = Hash::make($user->nid);
+//         $user->save();
+//     }
+
+//     return '✅ Semua password user berhasil di-reset ke NID.';
+// });

@@ -3,27 +3,48 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ResetPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset requests
-    | and uses a simple trait to include this behavior. You're free to
-    | explore this trait and override any methods you wish to tweak.
-    |
-    */
-
-    use ResetsPasswords;
+    /**
+     * Tampilkan form reset password (dari link email).
+     */
+    public function showResetForm(Request $request, $token = null)
+    {
+        return view('auth.reset-password')->with([
+            'token' => $token,
+            'email' => $request->email,
+        ]);
+    }
 
     /**
-     * Where to redirect users after resetting their password.
-     *
-     * @var string
+     * Simpan password baru.
      */
-    protected $redirectTo = '/home';
+    public function reset(Request $request)
+    {
+        $request->validate([
+            'token'    => 'required',
+            'email'    => 'required|email|exists:users,email',
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                // Simpan password baru
+                $user->password = Hash::make($password);
+                $user->setRememberToken(Str::random(60));
+                $user->save();
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('success', 'Password berhasil diubah. Silakan login kembali.')
+            : back()->withErrors(['email' => [__($status)]]);
+    }
 }

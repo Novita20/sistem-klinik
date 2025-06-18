@@ -1,11 +1,17 @@
 @extends('layouts.main')
 
 @section('content')
-    <div class="container">
-        <h1 class="mb-4">Rekam Medis Saya</h1>
+    <div class="container mt-4">
+        <h3 class="mb-4">📋 Rekam Medis Anda</h3>
+
+        @if (session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @elseif (session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
 
         @if ($rekamMedis->isEmpty())
-            <p>Tidak ada data rekam medis.</p>
+            <div class="alert alert-info">Belum ada Data Rekam Medis Anda.</div>
         @else
             <table class="table table-bordered">
                 <thead class="thead-dark">
@@ -13,7 +19,7 @@
                         <th>Tanggal Kunjungan</th>
                         <th>Keluhan</th>
                         <th>Diagnosa</th>
-                        <th>Resep</th>
+                        <th>Resep Obat</th>
                     </tr>
                 </thead>
                 <tbody>

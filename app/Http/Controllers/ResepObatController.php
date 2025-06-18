@@ -26,11 +26,11 @@ class ResepObatController extends Controller
         $user = Auth::user();
         $pasien = Pasien::where('user_id', $user->id)->first();
 
-        if (!$pasien) {
-            return redirect()->back()->with('error', 'Data pasien tidak ditemukan.');
+        if ($pasien) {
+            $reseps = ResepObat::where('pasien_id', $pasien->id)->get();
+        } else {
+            $reseps = collect(); // Koleksi kosong agar tidak error di blade
         }
-
-        $reseps = ResepObat::where('pasien_id', $pasien->id)->get();
 
         return view('pasien.resep', compact('reseps'));
     }

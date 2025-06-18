@@ -52,7 +52,16 @@
                         <input type="password" name="password" class="form-control" placeholder="Password" required>
                     </div>
                     <button type="submit" class="btn btn-primary w-100">Masuk</button>
+
+                    <div class="mt-3">
+                        <a href="{{ route('password.request') }}" class="text-decoration-none">
+                            Lupa Password?
+                        </a>
+                    </div>
+
+
                 </form>
+
 
                 <div class="mt-4">
                     <a href="{{ url('/') }}" class="btn btn-light border">

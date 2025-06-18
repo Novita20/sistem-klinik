@@ -10,19 +10,24 @@ use Carbon\Carbon;
 
 class KunjunganController extends Controller
 {
+    // FORM INPUT KUNJUNGAN
     public function create()
     {
         $user = Auth::user();
-        $pasien = $user->pasien; // pastikan relasi user -> pasien sudah ada
+        $pasien = $user->pasien;
 
         return view('pasien.form', compact('pasien'));
     }
 
+    // PROSES SIMPAN KUNJUNGAN
     public function store(Request $request)
     {
-        $request->validate([
-            'keluhan' => 'required|string',
-            'tgl_kunjungan' => 'required|date', // tambahkan validasi input waktu
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'tanggal_lahir' => 'required|date',
+            'jenis_kelamin' => 'required|in:L,P',
+            'tgl_kunjungan' => 'required|date',
+            'keluhan' => 'required|string|max:1000',
         ]);
 
         $user = Auth::user();
@@ -37,9 +42,15 @@ class KunjunganController extends Controller
                 'alamat' => '',
                 'no_hp' => '',
             ]);
+        } else {
+            // Update data pasien jika sudah ada
+            $pasien->update([
+                'tanggal_lahir' => $request->tanggal_lahir,
+                'jenis_kelamin' => $request->jenis_kelamin,
+            ]);
         }
 
-        // KONVERSI DARI WIB KE UTC sebelum simpan
+        // Konversi dari WIB ke UTC
         $tglKunjungan = Carbon::parse($request->tgl_kunjungan, 'Asia/Jakarta')->setTimezone('UTC');
 
         Kunjungan::create([
@@ -49,37 +60,33 @@ class KunjunganController extends Controller
             'paramedis_id' => null,
         ]);
 
-        return redirect()->back()->with('success', 'Data kunjungan berhasil disimpan!');
+        return redirect()->route('kunjungan.riwayat')->with('success', 'Data kunjungan berhasil disimpan!');
     }
 
-
-
-
-
+    // 🗂️ Riwayat kunjungan pasien
     public function riwayat()
     {
-        $pasien = Pasien::where('user_id', Auth::id())->first();
+        $user = Auth::user();
+        $pasien = $user->pasien;
 
-        if (!$pasien) {
-            return redirect()->back()->with('error', 'Data pasien belum ditemukan.');
+        if ($pasien) {
+            $riwayat = Kunjungan::where('pasien_id', $pasien->id)->latest()->get();
+        } else {
+            $riwayat = collect(); // Koleksi kosong supaya aman di view
         }
-
-        $riwayat = Kunjungan::where('pasien_id', $pasien->id)->latest()->get();
 
         return view('pasien.riwayat', compact('riwayat'));
     }
 
-
+    // RIWAYAT KUNJUNGAN UNTUK PARAMEDIS
     public function indexForParamedis()
     {
-        // Cek apakah user adalah paramedis
         if (Auth::user()->role !== 'paramedis') {
             abort(403, 'Unauthorized');
         }
 
-        // Ambil semua data kunjungan dan relasi pasien + user
         $kunjungan = Kunjungan::with('pasien.user')->latest()->get();
 
-        return redirect()->back()->with('success', 'Data kunjungan berhasil disimpan!');
+        return view('paramedis.kunjungan_index', compact('kunjungan'));
     }
 }
