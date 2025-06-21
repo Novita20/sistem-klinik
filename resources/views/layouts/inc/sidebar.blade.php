@@ -204,10 +204,10 @@
                 @if (Auth::check() && Auth::user()->role === 'dokter')
                     {{-- 📋 Data Pasien --}}
                     <li class="nav-item">
-                        <a href="{{ route('dokter.pasien') }}"
-                            class="nav-link {{ request()->routeIs('dokter.pasien') ? 'active' : '' }}">
+                        <a href="{{ route('dokter.kunjungan') }}"
+                            class="nav-link {{ request()->routeIs('dokter.kunjungan') ? 'active' : '' }}">
                             <i class="fas fa-users nav-icon"></i>
-                            <p>Data Pasien</p>
+                            <p>Data Kunjungan</p>
                         </a>
                     </li>
 

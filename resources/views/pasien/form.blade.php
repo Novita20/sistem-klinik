@@ -22,6 +22,12 @@
                 @enderror
             </div>
 
+            <div class="mb-4">
+                <label for="nid" class="block text-sm font-medium text-gray-700">NID</label>
+                <input type="text" name="nid" id="nid" value="{{ old('nid', $pasien->nid ?? '') }}"
+                    class="mt-1 block w-full border rounded p-2" />
+            </div>
+
 
             {{-- Tanggal Lahir --}}
             <div class="mb-4">
@@ -63,6 +69,23 @@
                     <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
                 @enderror
 
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold">Alamat</label>
+                <textarea name="alamat" rows="3"
+                    class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500">{{ old('alamat', $pasien->alamat ?? '') }}</textarea>
+                @error('alamat')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold">No. HP</label>
+                <input type="text" name="no_hp" value="{{ old('no_hp', $pasien->no_hp ?? '') }}"
+                    class="mt-1 block w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:border-blue-500">
+                @error('no_hp')
+                    <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                @enderror
             </div>
 
 

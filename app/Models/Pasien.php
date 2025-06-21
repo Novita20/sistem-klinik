@@ -13,6 +13,7 @@ class Pasien extends Model
 
     protected $fillable = [
         'user_id',
+        'nid',
         'tanggal_lahir',
         'jenis_kelamin',
         'alamat',
@@ -27,5 +28,10 @@ class Pasien extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function kunjungan()
+    {
+        return $this->hasMany(Kunjungan::class, 'pasien_id');
     }
 }

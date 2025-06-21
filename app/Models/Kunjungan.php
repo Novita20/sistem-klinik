@@ -33,6 +33,6 @@ class Kunjungan extends Model
     // Relasi ke rekam medis
     public function rekamMedis()
     {
-        return $this->hasOne(RekamMedis::class);
+        return $this->hasOne(RekamMedis::class, 'kunjungan_id');
     }
 }

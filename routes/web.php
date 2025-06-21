@@ -148,7 +148,11 @@ Route::middleware('auth')->group(function () {
     // 🩺 DATA PASIEN (DOKTER)
     // ========================
 
-    Route::get('/dokter/pasien', [DokterPasienController::class, 'index'])->name('dokter.pasien');
+
+    // Halaman daftar kunjungan pasien (utama)
+    Route::get('/dokter/kunjungan', [DokterPasienController::class, 'index'])->name('dokter.kunjungan');
+    Route::get('/dokter/kunjungan/show/{id}', [DokterPasienController::class, 'showKunjungan'])->name('dokter.kunjungan.show');
+    Route::get('/dokter/kunjungan/detail/{id}', [DokterPasienController::class, 'detailKunjungan'])->name('dokter.kunjungan.detail');
 
 
     // 🩺 REKAM MEDIS (DOKTER)
@@ -157,6 +161,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dokter/rekam-medis/ttv', [DokterRekamMedisController::class, 'ttv'])->name('dokter.rekammedis.ttv');
     Route::get('/dokter/rekam-medis/diagnosis', [DokterRekamMedisController::class, 'diagnosis'])->name('dokter.rekammedis.diagnosis');
     Route::get('/dokter/rekam-medis/tindakan', [DokterRekamMedisController::class, 'tindakan'])->name('dokter.rekammedis.tindakan');
+    Route::post('/dokter/rekam-medis/store', [DokterRekamMedisController::class, 'store'])->name('dokter.rekammedis.store');
+
 
     // 💊 RESEP OBAT (DOKTER)
     Route::get('/dokter/resep', [DokterResepController::class, 'index'])->name('dokter.resep');
@@ -185,6 +191,8 @@ Route::get('/debug-mail', function () {
 });
 
 
+
+//INI UNTUK RESET PASSWORD USER KE NID
 
 // use App\Models\User;
 // use Illuminate\Support\Facades\Hash;
