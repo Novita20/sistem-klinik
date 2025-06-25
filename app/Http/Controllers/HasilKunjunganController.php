@@ -10,35 +10,45 @@ use Illuminate\Support\Facades\Validator;
 
 class HasilKunjunganController extends Controller
 {
-    // 🟢 Menampilkan daftar kunjungan yang belum ditangani (atau belum punya status)
+    /**
+     * Menampilkan daftar kunjungan yang sedang berlangsung untuk paramedis
+     */
     public function index()
     {
         $kunjungan = Kunjungan::with(['pasien.user'])
-            ->where(function ($query) {
-                $query->whereNull('status')
-                    ->orWhere('status', 'belum ditangani');
-            })
-            ->latest()
+            ->whereIn('status', [
+                'belum_ditangani', // mungkin untuk dokter
+                'anamnesa_dokter', // selesai anamnesa, belum ke paramedis
+                'menunggu_pemeriksaan_paramedis',
+                'selesai_pemeriksaan_paramedis',
+            ])
+            ->latest('tgl_kunjungan')
             ->get();
 
         return view('paramedis.kunjungan_index', compact('kunjungan'));
     }
 
-    // 🟢 Menampilkan form rekam medis untuk kunjungan tertentu
+    /**
+     * Menampilkan form rekam medis paramedis untuk kunjungan
+     */
     public function create($kunjunganId)
     {
-        $kunjungan = Kunjungan::findOrFail($kunjunganId);
+        $kunjungan = Kunjungan::with('pasien.user')->findOrFail($kunjunganId);
         return view('paramedis.rekam_medis', compact('kunjungan'));
     }
 
-    // 🟢 Menampilkan detail kunjungan
+    /**
+     * Menampilkan detail kunjungan
+     */
     public function show($id)
     {
         $kunjungan = Kunjungan::with('pasien.user')->findOrFail($id);
         return view('paramedis.hasil_form', compact('kunjungan'));
     }
 
-    // 🟢 Menampilkan riwayat kunjungan paramedis
+    /**
+     * Menampilkan riwayat kunjungan paramedis
+     */
     public function riwayat()
     {
         $riwayatKunjungan = Kunjungan::with('pasien.user')
@@ -48,20 +58,19 @@ class HasilKunjunganController extends Controller
         return view('paramedis.riwayat_kunjungan', compact('riwayatKunjungan'));
     }
 
-    // 🟢 Menyimpan hasil rekam medis dari paramedis
+
+    /**
+     * Simpan hasil pemeriksaan paramedis ke rekam medis
+     */
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'kunjungan_id' => 'required|exists:kunjungan,id',
             'ttv'          => 'required|string',
             'diagnosa'     => 'required|string',
             'tindakan'     => 'required|string',
             'resep'        => 'nullable|string',
         ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
 
         RekamMedis::create([
             'kunjungan_id' => $request->kunjungan_id,
@@ -70,12 +79,14 @@ class HasilKunjunganController extends Controller
             'tindakan'     => $request->tindakan,
             'resep'        => $request->resep,
             'paramedis_id' => Auth::id(),
-            'dokter_id'    => null,
         ]);
 
-        // ✅ Update status kunjungan jadi 'sudah ditangani'
-        Kunjungan::findOrFail($request->kunjungan_id)->update(['status' => 'sudah ditangani']);
+        // Perbarui status kunjungan ke selesai_pemeriksaan_paramedis
+        $kunjungan = Kunjungan::findOrFail($request->kunjungan_id);
+        $kunjungan->status = 'selesai_pemeriksaan_paramedis';
+        $kunjungan->save();
 
-        return redirect()->route('paramedis.kunjungan.index')->with('success', 'Rekam medis berhasil disimpan.');
+        return redirect()->route('paramedis.kunjungan.index')
+            ->with('success', 'Rekam medis berhasil disimpan.');
     }
 }

@@ -8,6 +8,33 @@
 
 @section('content')
     <div class="p-6 bg-white shadow-md rounded-xl">
-        <p>Catatan anamnesa / keluhan pasien akan ditampilkan atau diinput di sini.</p>
+        @if ($rekamMedis->isEmpty())
+            <p class="text-gray-600 italic">Belum ada data anamnesa.</p>
+        @else
+            <table class="w-full table-auto border-collapse mt-4">
+                <thead>
+                    <tr class="bg-gray-200 text-left">
+                        <th class="px-4 py-2">Tanggal</th>
+                        <th class="px-4 py-2">Nama Pasien</th>
+                        <th class="px-4 py-2">Anamnesa</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($rekamMedis as $data)
+                        <tr class="border-b">
+                            <td class="px-4 py-2">
+                                {{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i') }}
+                            </td>
+                            <td class="px-4 py-2">
+                                {{ $data->kunjungan->pasien->user->name ?? '-' }}
+                            </td>
+                            <td class="px-4 py-2">
+                                {{ $data->anamnesa }}
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
     </div>
 @endsection

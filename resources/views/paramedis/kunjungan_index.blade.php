@@ -8,62 +8,89 @@
 
 @section('content')
     <div class="p-6">
-        {{-- Flash Message --}}
-        @if (session('success'))
-            <div class="mb-4 p-4 bg-green-100 text-green-800 rounded">{{ session('success') }}</div>
-        @endif
-
-        <div class="bg-white p-4 rounded-lg shadow">
-            <table class="min-w-full table-auto border text-sm">
-                <thead>
-                    <tr class="bg-gray-100 text-left">
-                        <th class="px-4 py-2 border">Nama Pasien</th>
-                        <th class="px-4 py-2 border">Tanggal Kunjungan</th>
-                        <th class="px-4 py-2 border">Keluhan</th>
-                        <th class="px-4 py-2 border">Status</th>
-                        <th class="px-4 py-2 border">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($kunjungan as $item)
+        <div class="bg-white p-6 rounded-xl shadow-md">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
                         <tr>
-                            <td class="px-4 py-2 border">{{ $item->pasien->user->name ?? '-' }}</td>
-                            <td class="px-4 py-2 border">
-                                {{ \Carbon\Carbon::parse($item->tgl_kunjungan)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
-                            </td>
-                            <td class="px-4 py-2 border">{{ $item->keluhan ?? '-' }}</td>
-                            <td class="px-4 py-2 border">
-                                @php
-                                    $status = strtolower($item->status ?? 'belum ditangani');
-                                @endphp
-
-                                @if ($status === 'belum ditangani')
-                                    <span class="text-red-600 font-semibold">Belum Ditangani</span>
-                                @elseif ($status === 'sudah ditangani')
-                                    <span class="text-green-600 font-semibold">Sudah Ditangani</span>
-                                @else
-                                    <span class="text-gray-600">-</span>
-                                @endif
-                            </td>
-                            <td class="px-4 py-2 border space-x-2">
-                                <a href="{{ route('paramedis.kunjungan.show', $item->id) }}"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
-                                    Detail
-                                </a>
-                                <a href="{{ route('paramedis.rekammedis.create', $item->id) }}"
-                                    class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded">
-                                    Tangani
-                                </a>
-                            </td>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Pasien</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Kunjungan
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Keluhan</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="text-center py-4 text-gray-500">Tidak ada kunjungan yang perlu
-                                ditangani saat ini.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse ($kunjungan as $item)
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {{ $item->pasien->user->name ?? '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {{ $item->tgl_kunjungan ? \Carbon\Carbon::parse($item->tgl_kunjungan)->format('d-m-Y H:i') : '-' }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {{ $item->keluhan ?? '-' }}
+                                </td>
+                                <td class="px-4 py-2 whitespace-nowrap">
+                                    @php
+                                        $status = $item->status ?? 'belum_ditangani';
+                                        $statusLabels = [
+                                            'belum_ditangani' => [
+                                                'label' => 'Belum Ditangani',
+                                                'color' => 'text-yellow-600',
+                                            ],
+                                            'menunggu_pemeriksaan_paramedis' => [
+                                                'label' => 'Menunggu Pemeriksaan Paramedis',
+                                                'color' => 'text-yellow-600',
+                                            ],
+                                            'selesai_pemeriksaan_paramedis' => [
+                                                'label' => 'Menunggu Pemeriksaan Dokter',
+                                                'color' => 'text-blue-600',
+                                            ],
+                                            'anamnesa_dokter' => [
+                                                'label' => 'Sedang Diperiksa Dokter',
+                                                'color' => 'text-indigo-600',
+                                            ],
+                                            'selesai_pemeriksaan_dokter' => [
+                                                'label' => 'Menunggu Obat',
+                                                'color' => 'text-green-600',
+                                            ],
+                                            'resep_diberikan' => [
+                                                'label' => 'Obat Telah Diberikan',
+                                                'color' => 'text-purple-600',
+                                            ],
+                                            'sudah_ditangani' => [
+                                                'label' => 'Sudah Ditangani',
+                                                'color' => 'text-green-700',
+                                            ],
+                                            'selesai' => ['label' => 'Pemeriksaan Selesai', 'color' => 'text-gray-700'],
+                                        ];
+                                        $statusInfo = $statusLabels[$status] ?? [
+                                            'label' => 'Status Tidak Dikenal',
+                                            'color' => 'text-red-600',
+                                        ];
+                                    @endphp
+                                    <span class="{{ $statusInfo['color'] }} font-semibold">{{ $statusInfo['label'] }}</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <a href="{{ route('paramedis.kunjungan.show', $item->id) }}"
+                                        class="text-indigo-600 hover:text-indigo-900 font-semibold">
+                                        Lihat Detail
+                                    </a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-4 text-gray-500">
+                                    Tidak ada kunjungan yang perlu ditangani saat ini.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 @endsection

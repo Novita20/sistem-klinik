@@ -15,6 +15,7 @@ class Kunjungan extends Model
         'pasien_id',
         'paramedis_id',
         'tgl_kunjungan',
+        'status',
         'keluhan',
     ];
 

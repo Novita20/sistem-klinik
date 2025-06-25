@@ -6,6 +6,7 @@ use App\Models\Obat;
 use App\Models\Pasien;
 use App\Models\RekamMedis;
 use App\Models\ResepObat;
+use App\Models\Kunjungan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,7 +36,7 @@ class ResepObatController extends Controller
         return view('pasien.resep', compact('reseps'));
     }
 
-    // 💾 Paramedis: Simpan resep baru
+    // 💾 Paramedis: Simpan resep baru & update status kunjungan
     public function store(Request $request)
     {
         $request->validate([
@@ -53,7 +54,7 @@ class ResepObatController extends Controller
         $obat->stok -= $request->jumlah;
         $obat->save();
 
-        // Ambil pasien_id dari rekam medis
+        // Ambil rekam medis dan pasien
         $rekamMedis = RekamMedis::findOrFail($request->rekam_medis_id);
         $pasienId = $rekamMedis->pasien_id;
 
@@ -63,9 +64,14 @@ class ResepObatController extends Controller
             'obat_id' => $request->obat_id,
             'jumlah' => $request->jumlah,
             'keterangan' => $request->keterangan,
-            'pasien_id' => $pasienId, // tambahkan pasien_id di sini
+            'pasien_id' => $pasienId,
         ]);
 
-        return back()->with('success', 'Resep berhasil disimpan');
+        // 🔁 Update status kunjungan ke selesai
+        $kunjungan = $rekamMedis->kunjungan;
+        $kunjungan->status = 'selesai';
+        $kunjungan->save();
+
+        return back()->with('success', 'Resep berhasil disimpan dan kunjungan selesai.');
     }
 }

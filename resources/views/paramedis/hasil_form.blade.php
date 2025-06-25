@@ -8,57 +8,48 @@
 
 @section('content')
     <div class="p-6">
-        <div class="bg-white p-6 rounded-2xl shadow-md w-full max-w-3xl mx-auto space-y-6">
+        <div class="bg-white p-6 rounded-2xl shadow-md space-y-6">
 
-            {{-- Nama Pasien --}}
+            {{-- 👤 Informasi Pasien --}}
             <div>
-                <label class="block text-gray-600 font-semibold">Nama Pasien</label>
-                <p class="mt-1 text-gray-900">
-                    {{ $kunjungan->pasien?->user?->name ?? '-' }}
-                </p>
-            </div>
-
-            {{-- Tanggal Lahir --}}
-            <div>
-                <label class="block text-gray-600 font-semibold">Tanggal Lahir</label>
-                <p class="mt-1 text-gray-900">
-                    {{ $kunjungan->pasien?->tanggal_lahir
+                <h2 class="text-xl font-semibold mb-2">👤 Informasi Pasien</h2>
+                <p><strong>Nama:</strong> {{ $kunjungan->pasien->user->name ?? '-' }}</p>
+                <p><strong>NID:</strong> {{ $kunjungan->pasien->user->nid ?? '-' }}</p>
+                <p><strong>Jenis Kelamin:</strong> {{ ucfirst($kunjungan->pasien->jenis_kelamin ?? '-') }}</p>
+                <p><strong>Tanggal Lahir:</strong>
+                    {{ $kunjungan->pasien->tanggal_lahir
                         ? \Carbon\Carbon::parse($kunjungan->pasien->tanggal_lahir)->format('d-m-Y')
                         : '-' }}
                 </p>
             </div>
 
-            {{-- Jenis Kelamin --}}
+            {{-- 📅 Detail Kunjungan --}}
             <div>
-                <label class="block text-gray-600 font-semibold">Jenis Kelamin</label>
-                <p class="mt-1 text-gray-900">
-                    {{ $kunjungan->pasien?->jenis_kelamin ? ucfirst($kunjungan->pasien->jenis_kelamin) : '-' }}
+                <h2 class="text-xl font-semibold mb-2">📅 Detail Kunjungan</h2>
+                <p><strong>Tanggal Kunjungan:</strong>
+                    {{ \Carbon\Carbon::parse($kunjungan->tgl_kunjungan)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
+                </p>
+                <p><strong>Keluhan:</strong> {{ $kunjungan->keluhan ?? '-' }}</p>
+                <p><strong>Status:</strong>
+                    <span class="font-semibold text-blue-600">
+                        {{ ucwords(str_replace('_', ' ', $kunjungan->status ?? 'Belum Ditangani')) }}
+                    </span>
                 </p>
             </div>
 
-            {{-- Keluhan --}}
-            <div>
-                <label class="block text-gray-600 font-semibold">Keluhan</label>
-                <p class="mt-1 text-gray-900">
-                    {{ $kunjungan->keluhan ?? '-' }}
-                </p>
-            </div>
+            {{-- 🩺 Anamnesa Dokter --}}
+            @if ($kunjungan->rekamMedis && $kunjungan->rekamMedis->anamnesa)
+                <div>
+                    <h2 class="text-xl font-semibold mb-2">🩺 Anamnesa dari Dokter</h2>
+                    <p><strong>Catatan:</strong> {{ $kunjungan->rekamMedis->anamnesa }}</p>
+                </div>
+            @endif
 
-            {{-- Tanggal Kunjungan (Konversi ke WIB) --}}
+            {{-- 🔙 Tombol Kembali --}}
             <div>
-                <label class="block text-gray-600 font-semibold">Tanggal Kunjungan</label>
-                <p class="mt-1 text-gray-900">
-                    {{ $kunjungan->tgl_kunjungan
-                        ? \Carbon\Carbon::parse($kunjungan->tgl_kunjungan)->timezone('Asia/Jakarta')->format('d-m-Y H:i')
-                        : '-' }}
-                </p>
-            </div>
-
-            {{-- Tombol Kembali --}}
-            <div class="pt-6">
                 <a href="{{ route('paramedis.kunjungan.index') }}"
-                    class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-150">
-                    ← Kembali ke Data Kunjungan
+                    class="inline-block mt-4 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+                    ← Kembali ke Daftar Kunjungan
                 </a>
             </div>
 

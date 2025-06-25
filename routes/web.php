@@ -120,11 +120,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/paramedis/rekam-medis/store', [HasilKunjunganController::class, 'store'])->name('paramedis.rekammedis.store');
 
 
-
     // 🩺 PEMERIKSAAN AWAL PARAMEDIS
-    Route::get('/paramedis/pemeriksaan-awal', [PemeriksaanAwalController::class, 'index'])->name('paramedis.pemeriksaan.awal');
-    Route::get('/paramedis/pemeriksaan-awal/{id}', [PemeriksaanAwalController::class, 'show'])->name('paramedis.pemeriksaan.awal.show');
-    Route::post('/paramedis/pemeriksaan-awal/store', [PemeriksaanAwalController::class, 'store'])->name('paramedis.pemeriksaan.awal.store');
+    Route::get('/pemeriksaan-awal', [PemeriksaanAwalController::class, 'index'])->name('paramedis.pemeriksaan.awal');
+
+    // Form input pemeriksaan awal berdasarkan ID kunjungan
+    Route::get('/pemeriksaan-awal/{id}', [PemeriksaanAwalController::class, 'show'])->name('paramedis.pemeriksaan.awal.show');
+
+    // Menyimpan data hasil pemeriksaan awal
+    Route::post('/pemeriksaan-awal/store', [PemeriksaanAwalController::class, 'store'])->name('paramedis.pemeriksaan.awal.store');
+
 
     //INPUT OBAT DAN MUTASI OBAT
     Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
@@ -153,6 +157,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dokter/kunjungan', [DokterPasienController::class, 'index'])->name('dokter.kunjungan');
     Route::get('/dokter/kunjungan/show/{id}', [DokterPasienController::class, 'showKunjungan'])->name('dokter.kunjungan.show');
     Route::get('/dokter/kunjungan/detail/{id}', [DokterPasienController::class, 'detailKunjungan'])->name('dokter.kunjungan.detail');
+    Route::post('/dokter/rekam-medis/store', [DokterRekamMedisController::class, 'store'])->name('dokter.rekammedis.store');
+
 
 
     // 🩺 REKAM MEDIS (DOKTER)
@@ -161,7 +167,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dokter/rekam-medis/ttv', [DokterRekamMedisController::class, 'ttv'])->name('dokter.rekammedis.ttv');
     Route::get('/dokter/rekam-medis/diagnosis', [DokterRekamMedisController::class, 'diagnosis'])->name('dokter.rekammedis.diagnosis');
     Route::get('/dokter/rekam-medis/tindakan', [DokterRekamMedisController::class, 'tindakan'])->name('dokter.rekammedis.tindakan');
-    Route::post('/dokter/rekam-medis/store', [DokterRekamMedisController::class, 'store'])->name('dokter.rekammedis.store');
+    // Route::post('/dokter/rekam-medis/store', [DokterRekamMedisController::class, 'store'])->name('dokter.rekammedis.store');
+    Route::put('/dokter/rekammedis/update/{id}', [DokterRekamMedisController::class, 'update'])->name('dokter.rekammedis.update');
 
 
     // 💊 RESEP OBAT (DOKTER)

@@ -28,56 +28,71 @@
                 </p>
                 <p><strong>Keluhan:</strong> {{ $kunjungan->keluhan ?? '-' }}</p>
                 <p><strong>Status:</strong>
-                    @if ($kunjungan->status === 'belum ditangani')
-                        <span class="text-red-600 font-semibold">Belum Ditangani</span>
-                    @else
-                        <span class="text-green-600 font-semibold">Sudah Ditangani</span>
-                    @endif
+                    <span class="font-semibold text-blue-600">
+                        {{ ucwords(str_replace('_', ' ', $kunjungan->status ?? 'belum ditangani')) }}
+                    </span>
                 </p>
             </div>
 
-            {{-- Form Pemeriksaan Jika Belum Ditangani --}}
+            {{-- Form Anamnesa Dokter --}}
             @if (!$kunjungan->rekamMedis)
                 <div>
-                    <h2 class="text-xl font-semibold mb-2">📝 Pemeriksaan</h2>
+                    <h2 class="text-xl font-semibold mb-2">🩺 Anamnesa Dokter</h2>
                     <form action="{{ route('dokter.rekammedis.store') }}" method="POST" class="space-y-4">
                         @csrf
                         <input type="hidden" name="kunjungan_id" value="{{ $kunjungan->id }}">
 
                         <div>
-                            <label class="block font-medium">TTV</label>
-                            <input type="text" name="ttv" class="w-full border rounded px-3 py-2" required>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium">Diagnosa</label>
-                            <textarea name="diagnosa" class="w-full border rounded px-3 py-2" required></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium">Tindakan</label>
-                            <textarea name="tindakan" class="w-full border rounded px-3 py-2" required></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block font-medium">Resep</label>
-                            <textarea name="resep" class="w-full border rounded px-3 py-2"></textarea>
+                            <label class="block font-medium">Anamnesa</label>
+                            <textarea name="anamnesa" class="w-full border rounded px-3 py-2" required></textarea>
                         </div>
 
                         <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
-                            Simpan Pemeriksaan
+                            Simpan Anamnesa
                         </button>
                     </form>
                 </div>
             @else
-                {{-- Tampilkan hasil rekam medis --}}
+                {{-- Jika sudah ada rekam medis --}}
                 <div>
-                    <h2 class="text-xl font-semibold mb-2">📋 Rekam Medis</h2>
-                    <p><strong>TTV:</strong> {{ $kunjungan->rekamMedis->ttv ?? '-' }}</p>
-                    <p><strong>Diagnosa:</strong> {{ $kunjungan->rekamMedis->diagnosa ?? '-' }}</p>
-                    <p><strong>Tindakan:</strong> {{ $kunjungan->rekamMedis->tindakan ?? '-' }}</p>
-                    <p><strong>Resep:</strong> {{ $kunjungan->rekamMedis->resep ?? '-' }}</p>
+                    <h2 class="text-xl font-semibold mb-2">📋 Anamnesa</h2>
+                    <p><strong>Isi Anamnesa:</strong> {{ $kunjungan->rekamMedis->anamnesa ?? '-' }}</p>
                 </div>
+
+                @if ($kunjungan->status === 'selesai_pemeriksaan_paramedis' || $kunjungan->status === 'tindakan_dokter')
+                    {{-- Form Diagnosa & Tindakan --}}
+                    <div>
+                        <h2 class="text-xl font-semibold mt-6 mb-2">🧾 Diagnosa & Tindakan</h2>
+                        <form action="{{ route('dokter.rekammedis.update', $kunjungan->rekamMedis->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+
+                            <div>
+                                <label class="block font-medium">Diagnosa</label>
+                                <textarea name="diagnosa" class="w-full border rounded px-3 py-2" required>{{ $kunjungan->rekamMedis->diagnosa }}</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block font-medium">Tindakan</label>
+                                <textarea name="tindakan" class="w-full border rounded px-3 py-2" required>{{ $kunjungan->rekamMedis->tindakan }}</textarea>
+                            </div>
+
+                            <div>
+                                <label class="block font-medium">Resep</label>
+                                <textarea name="resep" class="w-full border rounded px-3 py-2">{{ $kunjungan->rekamMedis->resep }}</textarea>
+                            </div>
+
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                                Simpan Diagnosa & Tindakan
+                            </button>
+                        </form>
+                    </div>
+                @else
+                    <div class="text-sm text-gray-600 italic">
+                        Menunggu hasil pemeriksaan paramedis (TTV, GDS, dll) sebelum dokter melanjutkan diagnosa dan
+                        tindakan.
+                    </div>
+                @endif
             @endif
 
             {{-- Tombol Kembali --}}

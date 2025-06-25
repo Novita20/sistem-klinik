@@ -36,14 +36,38 @@
                                     {{ $kunjungan->rekamMedis && $kunjungan->rekamMedis->dokter ? $kunjungan->rekamMedis->dokter->name : '-' }}
                                 </td>
                                 <td>
-                                    @php $status = $kunjungan->status ?? 'Belum ditangani'; @endphp
-                                    @if ($status === 'Belum ditangani')
-                                        <span class="badge bg-warning text-dark">Belum Ditangani</span>
-                                    @elseif ($status === 'sudah ditangani')
-                                        <span class="badge bg-success">Sudah Ditangani</span>
-                                    @else
-                                        <span class="badge bg-secondary">-</span>
-                                    @endif
+                                    @php
+                                        $status = $kunjungan->status ?? 'belum_ditangani';
+                                    @endphp
+
+                                    @switch($status)
+                                        @case('belum_ditangani')
+                                            <span class="badge bg-warning text-dark">Belum Ditangani</span>
+                                        @break
+
+                                        @case('anamnesa_dokter')
+                                            <span class="badge bg-primary">Anamnesa Dokter</span>
+                                        @break
+
+                                        @case('menunggu_pemeriksaan_paramedis')
+                                            <span class="badge bg-info text-dark">Menunggu Pemeriksaan</span>
+                                        @break
+
+                                        @case('selesai_pemeriksaan_paramedis')
+                                            <span class="badge bg-secondary">Pemeriksaan Selesai</span>
+                                        @break
+
+                                        @case('tindakan_dokter')
+                                            <span class="badge bg-success">Selesai Ditangani</span>
+                                        @break
+
+                                        @case('selesai')
+                                            <span class="badge bg-success">Selesai</span>
+                                        @break
+
+                                        @default
+                                            <span class="badge bg-dark">-</span>
+                                    @endswitch
                                 </td>
                             </tr>
                         @endforeach
