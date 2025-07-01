@@ -9,18 +9,25 @@ use App\Models\RekamMedis;
 
 class RekamMedisController extends Controller
 {
+    /**
+     * Tampilkan rekam medis untuk pasien yang sedang login
+     */
     public function index()
     {
-        // Ambil pasien yang sedang login
         $user = Auth::user();
 
-        // Ambil semua kunjungan milik pasien
-        $rekamMedis = Kunjungan::where('pasien_id', $user->id)
+        // Ambil kunjungan pasien beserta data rekam medis (jika ada)
+        $rekamMedis = Kunjungan::with('rekamMedis')
+            ->where('pasien_id', $user->id)
             ->orderBy('tgl_kunjungan', 'desc')
             ->get();
 
         return view('pasien.rm', compact('rekamMedis'));
     }
+
+    /**
+     * Simpan data rekam medis dari dokter
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -41,8 +48,9 @@ class RekamMedisController extends Controller
             'paramedis_id' => null,
         ]);
 
-        // update status kunjungan
-        Kunjungan::findOrFail($request->kunjungan_id)->update(['status' => 'sudah ditangani']);
+        Kunjungan::findOrFail($request->kunjungan_id)->update([
+            'status' => 'sudah ditangani'
+        ]);
 
         return redirect()->route('dokter.kunjungan')->with('success', 'Rekam medis berhasil disimpan.');
     }

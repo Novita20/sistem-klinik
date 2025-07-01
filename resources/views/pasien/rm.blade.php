@@ -10,25 +10,31 @@
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
 
-        @if ($rekamMedis->isEmpty())
-            <div class="alert alert-info">Belum ada Data Rekam Medis Anda.</div>
+        @if ($rekamMedis->count() == 0)
+            <div class="alert alert-info">Belum ada data kunjungan Anda.</div>
         @else
-            <table class="table table-bordered">
+            <table class="table table-bordered table-striped">
                 <thead class="thead-dark">
                     <tr>
+                        <th>No</th>
                         <th>Tanggal Kunjungan</th>
-                        <th>Keluhan</th>
+                        <th>Anamnesa (Keluhan)</th>
+                        <th>TTV</th>
                         <th>Diagnosa</th>
-                        <th>Resep Obat</th>
+                        <th>Tindakan</th>
+                        <th>Resep</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($rekamMedis as $rm)
+                    @foreach ($rekamMedis as $i => $rm)
                         <tr>
-                            <td>{{ $rm->tgl_kunjungan }}</td>
+                            <td>{{ $i + 1 }}</td>
+                            <td>{{ \Carbon\Carbon::parse($rm->tgl_kunjungan)->format('d-m-Y') }}</td>
                             <td>{{ $rm->keluhan ?? '-' }}</td>
-                            <td>{{ $rm->diagnosa ?? '-' }}</td>
-                            <td>{{ $rm->resep ?? '-' }}</td>
+                            <td>{{ $rm->rekamMedis->ttv ?? '-' }}</td>
+                            <td>{{ $rm->rekamMedis->diagnosa ?? '-' }}</td>
+                            <td>{{ $rm->rekamMedis->tindakan ?? '-' }}</td>
+                            <td>{{ $rm->rekamMedis->resep ?? '-' }}</td>
                         </tr>
                     @endforeach
                 </tbody>

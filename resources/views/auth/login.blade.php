@@ -19,7 +19,7 @@
 
         <div class="overlay">
             <div class="form-wrapper text-center">
-                <img src="{{ asset('assets/dist/img/pln.png') }}" class="mb-3" style="width: 120px;">
+                <img src="{{ asset('assets/dist/img/plnnp.png') }}" class="mb-3" style="width: 120px;">
                 <h2 class="mb-2">Selamat Datang 👋</h2>
                 <p class="mb-4">Masukkan Username atau Name dan Password Anda</p>
 

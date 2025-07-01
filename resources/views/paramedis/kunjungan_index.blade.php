@@ -13,24 +13,26 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-100">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Pasien</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal Kunjungan
+                            <th class="px-4 py-2 border">No.</th>
+                            <th class="px-4 py-2 border">Nama Pasien</th>
+                            <th class="px-4 py-2 border">Tanggal Kunjungan
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Keluhan</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                            <th class="px-4 py-2 border">Keluhan</th>
+                            <th class="px-4 py-2 border">Status</th>
+                            <th class="px-4 py-2 border">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($kunjungan as $item)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-2 border">{{ $loop->iteration }}</td>
+                                <td class="px-4 py-2 border">
                                     {{ $item->pasien->user->name ?? '-' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-2 border">
                                     {{ $item->tgl_kunjungan ? \Carbon\Carbon::parse($item->tgl_kunjungan)->format('d-m-Y H:i') : '-' }}
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-2 border">
                                     {{ $item->keluhan ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2 whitespace-nowrap">
@@ -74,7 +76,7 @@
                                     @endphp
                                     <span class="{{ $statusInfo['color'] }} font-semibold">{{ $statusInfo['label'] }}</span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
+                                <td class="px-4 py-2 border">
                                     <a href="{{ route('paramedis.kunjungan.show', $item->id) }}"
                                         class="text-indigo-600 hover:text-indigo-900 font-semibold">
                                         Lihat Detail

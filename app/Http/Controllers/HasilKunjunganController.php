@@ -36,7 +36,6 @@ class HasilKunjunganController extends Controller
         $kunjungan = Kunjungan::with('pasien.user')->findOrFail($kunjunganId);
         return view('paramedis.rekam_medis', compact('kunjungan'));
     }
-
     /**
      * Menampilkan detail kunjungan
      */

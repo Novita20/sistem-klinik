@@ -12,6 +12,7 @@
             <table class="min-w-full table-auto border">
                 <thead>
                     <tr class="bg-gray-100 text-left">
+                        <th class="px-4 py-2 border">No.</th>
                         <th class="px-4 py-2 border">Nama Pasien</th>
                         <th class="px-4 py-2 border">Tanggal Kunjungan</th>
                         <th class="px-4 py-2 border">Keluhan</th>
@@ -20,6 +21,7 @@
                 <tbody>
                     @forelse ($riwayatKunjungan as $kunjungan)
                         <tr>
+                            <td class="px-4 py-2 border">{{ $loop->iteration }}</td> {{-- Kolom No --}}
                             <td class="px-4 py-2 border">{{ $kunjungan->pasien->user->name ?? '-' }}</td>
                             <td class="px-4 py-2 border">
                                 {{ \Carbon\Carbon::parse($kunjungan->tgl_kunjungan)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}

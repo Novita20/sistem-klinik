@@ -36,4 +36,8 @@ class Kunjungan extends Model
     {
         return $this->hasOne(RekamMedis::class, 'kunjungan_id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'pasien_id');
+    }
 }

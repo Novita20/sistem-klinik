@@ -9,27 +9,50 @@ use App\Models\RekamMedis;
 class DokterPasienController extends Controller
 {
     // Halaman daftar kunjungan pasien untuk dokter
-    public function index()
+    public function index(Request $request)
     {
-        $kunjungan = Kunjungan::with(['pasien.user', 'rekamMedis'])
-            ->orderByDesc('tgl_kunjungan')
-            ->get();
+        $search = $request->input('search');
 
-        return view('dokter.pasien', compact('kunjungan')); // view daftar kunjungan pasien
+        $kunjungan = Kunjungan::with([
+            'pasien.user',
+            'rekamMedis.resepObat.obat' // ⬅️ Ini penting untuk menampilkan resep dan nama obat
+        ])
+            ->when($search, function ($query, $search) {
+                return $query->whereHas('pasien.user', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('tgl_kunjungan', 'desc')
+            ->paginate(10);
+
+        return view('dokter.kunjungan', compact('kunjungan', 'search'));
     }
 
-    // Menampilkan semua kunjungan (tidak digunakan saat ini)
+
+
     public function showKunjungan($id)
     {
-        $kunjungan = Kunjungan::with(['pasien.user'])->get();
+        $kunjungan = Kunjungan::with([
+            'pasien.user',
+            'rekamMedis.resepObat.obat'
+        ])->get();
+
+        dd($kunjungan); // LETAKKAN DI SINI
+
         return view('dokter.kunjungan', compact('kunjungan'));
     }
+
+
 
     // Menampilkan detail kunjungan untuk dokter
     public function detailKunjungan($id)
     {
         $kunjungan = Kunjungan::with(['pasien.user', 'rekamMedis'])->findOrFail($id);
-        return view('dokter.kunjungan_detail', compact('kunjungan'));
+
+        // Simpan ke session
+        session(['kunjungan_id' => $kunjungan->id]);
+
+        return view('dokter.diagnosis', compact('kunjungan'));
     }
 
     // Menyimpan anamnesa dokter

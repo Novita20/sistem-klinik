@@ -19,6 +19,7 @@
                 <table class="table table-bordered table-striped">
                     <thead class="table-dark">
                         <tr>
+                            <th>No</th>
                             <th>Tanggal</th>
                             <th>Keluhan</th>
                             <th>Dokter</th>
@@ -58,7 +59,7 @@
                                         @break
 
                                         @case('tindakan_dokter')
-                                            <span class="badge bg-success">Selesai Ditangani</span>
+                                            <span class="badge bg-primary">Tindakan Dokter</span>
                                         @break
 
                                         @case('selesai')

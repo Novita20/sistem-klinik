@@ -15,9 +15,11 @@ class ResepObat extends Model
         'rekam_medis_id',
         'obat_id',
         'jumlah',
-        'keterangan',
+        'dosis',
+        'aturan_pakai',
         'pasien_id',
     ];
+
 
     /**
      * Relasi ke rekam medis
@@ -33,5 +35,11 @@ class ResepObat extends Model
     public function obat()
     {
         return $this->belongsTo(Obat::class);
+    }
+
+
+    public function pasien()
+    {
+        return $this->belongsTo(Pasien::class, 'pasien_id');
     }
 }

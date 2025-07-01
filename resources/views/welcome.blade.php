@@ -38,8 +38,7 @@
                 <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-4">
                     Selamat Datang di Klinik PLN Nusantara Power Paiton
                 </h1>
-                <p class="text-lg md:text-xl mb-6">Kami berkomitmen memberikan pelayanan kesehatan terbaik untuk Anda dan
-                    keluarga.</p>
+                <p class="text-lg md:text-xl mb-6">Kami berkomitmen memberikan pelayanan kesehatan terbaik untuk Anda.</p>
                 <a href="#artikel" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition">
                     Baca Info Kesehatan
                 </a>

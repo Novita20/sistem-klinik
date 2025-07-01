@@ -34,7 +34,7 @@
                     <div class="card-header bg-success text-white">Resep Obat</div>
                     <div class="card-body">
                         <p>Input resep berdasarkan hasil pemeriksaan atau instruksi dokter ringan.</p>
-                        <a href="{{ route('resep.obat') }}" class="btn btn-success">Input Resep</a>
+                        <a href="{{ route('pasien.resep.index') }}" class="btn btn-success">Input Resep</a>
                     </div>
                 </div>
             </div>

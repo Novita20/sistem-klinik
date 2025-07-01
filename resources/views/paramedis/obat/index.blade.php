@@ -10,22 +10,21 @@
     <div class="p-6">
         {{-- Notifikasi sukses --}}
         @if (session('success'))
-            <div class="alert alert-success mb-4">
+            <div class="mb-4 p-4 bg-green-100 text-green-800 border border-green-300 rounded">
                 {{ session('success') }}
             </div>
         @endif
 
         {{-- Header atas tabel: tombol + search --}}
         <div class="mb-4 flex justify-between items-center">
-            <a href="{{ route('obat.create') }}" class="btn btn-primary">+ Tambah Obat</a>
+            <a href="{{ route('paramedis.resep.create') }}" class="btn btn-primary">+ Tambah Obat</a>
 
-            <form action="{{ route('obat.index') }}" method="GET" class="flex items-center">
+            <form action="{{ route('paramedis.resep.index') }}" method="GET" class="flex items-center">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama obat..."
                     class="form-input mr-2">
                 <button type="submit" class="btn btn-secondary mr-2">Cari</button>
-                <a href="{{ route('obat.index') }}" class="btn btn-outline-secondary">Tampilkan Semua</a>
+                <a href="{{ route('paramedis.resep.index') }}" class="btn btn-outline-secondary">Tampilkan Semua</a>
             </form>
-
         </div>
 
         {{-- Tabel Data Obat --}}
@@ -40,7 +39,7 @@
                         <th class="py-2 px-4 border">Satuan</th>
                         <th class="py-2 px-4 border">Tanggal Input</th>
                         <th class="py-2 px-4 border">Kadaluarsa</th>
-
+                        <th class="py-2 px-4 border">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -52,15 +51,16 @@
                             <td class="py-2 px-4 border">{{ $obat->stok }}</td>
                             <td class="py-2 px-4 border">{{ $obat->satuan }}</td>
                             <td class="py-2 px-4 border">{{ \Carbon\Carbon::parse($obat->created_at)->format('d-m-Y') }}
-                            <td class="py-2 px-4 border">{{ \Carbon\Carbon::parse($obat->expired_at)->format('d-m-Y') }}
-
                             </td>
-
+                            <td class="py-2 px-4 border">{{ \Carbon\Carbon::parse($obat->expired_at)->format('d-m-Y') }}
+                            </td>
+                            <td class="py-2 px-4 border">
+                                <a href="{{ route('obat.edit', $obat->id) }}" class="btn btn-sm btn-warning">Edit</a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-4 text-gray-500">Tidak ada data obat.</td>
+                            <td colspan="8" class="text-center py-4 text-gray-500">Tidak ada data obat.</td>
                         </tr>
                     @endforelse
                 </tbody>

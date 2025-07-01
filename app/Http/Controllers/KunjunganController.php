@@ -67,7 +67,7 @@ class KunjunganController extends Controller
             'tgl_kunjungan' => $tglKunjungan,
             'keluhan'       => $validated['keluhan'],
             'paramedis_id'  => null,
-            'status'        => 'Belum ditangani', // ✅ default status
+            'status'        => 'belum_ditangani', // ✅ default status
         ]);
 
         return redirect()->route('kunjungan.riwayat')->with('success', 'Data kunjungan berhasil disimpan!');

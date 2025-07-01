@@ -51,8 +51,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="{{ route('resep.obat') }}"
-                            class="nav-link {{ request()->routeIs('resep.obat') ? 'active' : '' }}">
+                        <a href="{{ route('pasien.resep.index') }}"
+                            class="nav-link {{ request()->routeIs('pasien.resep.index') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-pills"></i>
                             <p>Resep Obat</p>
                         </a>
@@ -119,6 +119,7 @@
                                     <p>Pemeriksaan Awal</p>
                                 </a>
                             </li>
+
                             <li class="nav-item">
                                 <a href="{{ route('rekam.medis') }}"
                                     class="nav-link pl-4 {{ $routeName === 'rekam.medis' ? 'active' : '' }}">
@@ -126,12 +127,14 @@
                                     <p>Rekam Medis (Lihat)</p>
                                 </a>
                             </li>
+
                             <li class="nav-item">
-                                <a href="{{ route('resep.create') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'resep.create' ? 'active' : '' }}">
+                                <a href="{{ route('paramedis.resep.index') }}"
+                                    class="nav-link pl-4 {{ $routeName === 'paramedis.resep.index' ? 'active' : '' }}">
                                     <i class="fas fa-pills nav-icon"></i>
-                                    <p>Input Resep Obat</p>
+                                    <p>Daftar Resep Obat</p>
                                 </a>
+
                             </li>
                         </ul>
                     </li>
@@ -214,7 +217,7 @@
                     {{-- 🩺 Rekam Medis --}}
                     <li
                         class="nav-item has-treeview
-        {{ request()->routeIs('dokter.rekammedis.*') ? 'menu-open' : '' }}">
+             {{ request()->routeIs('dokter.rekammedis.*') ? 'menu-open' : '' }}">
                         <a href="#"
                             class="nav-link {{ request()->routeIs('dokter.rekammedis.*') ? 'active' : '' }}">
                             <i class="fas fa-file-medical nav-icon"></i>
@@ -238,6 +241,7 @@
                                     <p>Hasil TTV & Labor</p>
                                 </a>
                             </li>
+
                             <li class="nav-item">
                                 <a href="{{ route('dokter.rekammedis.diagnosis') }}"
                                     class="nav-link pl-4 {{ request()->routeIs('dokter.rekammedis.diagnosis') ? 'active' : '' }}">
@@ -245,24 +249,30 @@
                                     <p>Diagnosis</p>
                                 </a>
                             </li>
-                            <li class="nav-item">
+
+
+
+                            {{-- <li class="nav-item">
                                 <a href="{{ route('dokter.rekammedis.tindakan') }}"
                                     class="nav-link pl-4 {{ request()->routeIs('dokter.rekammedis.tindakan') ? 'active' : '' }}">
                                     <i class="fas fa-syringe nav-icon"></i>
                                     <p>Terapi / Tindakan</p>
                                 </a>
-                            </li>
+                            </li> --}}
                         </ul>
                     </li>
 
                     {{-- 💊 Resep Obat --}}
                     <li class="nav-item">
+                        {{-- Karena route ini butuh rekam_medis_id, jangan panggil langsung --}}
+                        {{-- Alternatifnya, arahkan ke daftar resep --}}
                         <a href="{{ route('dokter.resep') }}"
                             class="nav-link {{ request()->routeIs('dokter.resep') ? 'active' : '' }}">
                             <i class="fas fa-pills nav-icon"></i>
                             <p>Resep Obat</p>
                         </a>
                     </li>
+
 
                     {{-- 👤 Profil --}}
                     <li class="nav-item has-treeview {{ request()->routeIs('profile.edit') ? 'menu-open' : '' }}">

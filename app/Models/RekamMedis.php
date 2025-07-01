@@ -17,6 +17,7 @@ class RekamMedis extends Model
         'ttv',
         'hasil_mcu',
         'diagnosis',
+        'tindakan',
     ];
 
     /**
@@ -33,5 +34,9 @@ class RekamMedis extends Model
     public function dokter()
     {
         return $this->belongsTo(User::class, 'dokter_id');
+    }
+    public function resepObat()
+    {
+        return $this->hasMany(ResepObat::class);
     }
 }

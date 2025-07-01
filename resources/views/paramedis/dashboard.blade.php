@@ -29,7 +29,7 @@
                 </div>
             </div>
 
-            <div class="col-md-4 mb-3">
+            {{-- <div class="col-md-4 mb-3">
                 <div class="card h-100">
                     <div class="card-header bg-success text-white">Resep Obat</div>
                     <div class="card-body">
@@ -37,7 +37,7 @@
                         <a href="{{ route('resep.obat') }}" class="btn btn-success">Input Resep</a>
                     </div>
                 </div>
-            </div>
+            </div> --}}
 
             <div class="col-md-4 mb-3">
                 <div class="card h-100">
