@@ -15,7 +15,7 @@
         @else
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
+                    <thead class="table-primary">
                         <tr>
                             <th>No.</th>
                             <th>Tanggal Kunjungan</th>

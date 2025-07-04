@@ -35,7 +35,7 @@
                                 <td class="px-4 py-2 border">
                                     {{ $item->keluhan ?? '-' }}
                                 </td>
-                                <td class="px-4 py-2 whitespace-nowrap">
+                                <td class="px-4 py-2 border">
                                     @php
                                         $status = $item->status ?? 'belum_ditangani';
                                         $statusLabels = [

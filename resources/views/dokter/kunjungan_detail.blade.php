@@ -87,17 +87,34 @@
                     </div>
 
                     {{-- 💊 Tambah Resep Obat --}}
-                    <div class="mt-4">
-                        <a href="{{ route('dokter.resep.create', $kunjungan->rekamMedis->id) }}"
-                            class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
-                            ➕ Tambah Resep Obat
-                        </a>
-                    </div>
-                @else
-                    <div class="text-sm text-gray-600 italic">
-                        Menunggu hasil pemeriksaan paramedis (TTV, GDS, dll) sebelum dokter melanjutkan diagnosa dan
-                        tindakan.
-                    </div>
+                    @if ($kunjungan->rekamMedis)
+                        <div class="mt-4">
+                            <a href="{{ route('dokter.resep.create', $kunjungan->rekamMedis->id) }}"
+                                class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+                                ➕ Tambah Resep Obat
+                            </a>
+                        </div>
+                    @else
+                        <div class="text-sm text-gray-600 italic mt-2">
+                            @switch($kunjungan->status)
+                                @case('belum_ditangani')
+                                    Menunggu hasil pemeriksaan paramedis (TTV, GDS, dll) sebelum dokter melanjutkan diagnosa dan
+                                    tindakan.
+                                @break
+
+                                @case('selesai')
+                                    Kunjungan telah selesai. Semua data telah direkam.
+                                @break
+
+                                @case('tindakan_dokter')
+                                    Tindakan dokter telah dilakukan. Silakan periksa detail rekam medis.
+                                @break
+
+                                @default
+                                    Status kunjungan saat ini: {{ $kunjungan->status }}
+                            @endswitch
+                        </div>
+                    @endif
                 @endif
             @endif
 

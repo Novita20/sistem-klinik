@@ -42,4 +42,10 @@ class ResepObat extends Model
     {
         return $this->belongsTo(Pasien::class, 'pasien_id');
     }
+
+    public function logObat()
+    {
+        return $this->hasOne(\App\Models\LogObat::class, 'ref_id', 'id')
+            ->where('ref_type', 'resep');
+    }
 }

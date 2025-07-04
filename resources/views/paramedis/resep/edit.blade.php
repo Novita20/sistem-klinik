@@ -4,7 +4,7 @@
     <div class="container mx-auto mt-6">
         <h2 class="text-xl font-bold text-gray-800 mb-4">✏️ Edit Resep Obat</h2>
 
-        <form action="{{ route('resep.update', $resep->id) }}" method="POST" class="bg-white p-6 rounded shadow-md">
+        <form action="{{ route('paramedis.resep.update', $resep->id) }}" method="POST" class="bg-white p-6 rounded shadow-md">
             @csrf
             @method('PUT')
 

@@ -6,6 +6,7 @@ use App\Models\Obat;
 use App\Models\Pasien;
 use App\Models\RekamMedis;
 use App\Models\ResepObat;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +18,8 @@ class ResepObatController extends Controller
         $query = ResepObat::with([
             'rekamMedis.kunjungan',
             'pasien.user',
-            'obat'
+            'obat',
+            'logObat',
         ]);
 
         if ($request->filled('search')) {
@@ -125,7 +127,7 @@ class ResepObatController extends Controller
         $resep = ResepObat::findOrFail($id);
         $resep->delete();
 
-        return redirect()->route('paramedis.resep.index')->with('success', 'Resep berhasil dihapus.');
+        return redirect()->route('paramedis.resep.destroy')->with('success', 'Resep berhasil dihapus.');
     }
 
     // 👤 Pasien: Menampilkan resep miliknya

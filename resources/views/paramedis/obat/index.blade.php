@@ -19,11 +19,11 @@
         <div class="mb-4 flex justify-between items-center">
             <a href="{{ route('paramedis.resep.create') }}" class="btn btn-primary">+ Tambah Obat</a>
 
-            <form action="{{ route('paramedis.resep.index') }}" method="GET" class="flex items-center">
+            <form action="{{ route('obat.index') }}" method="GET" class="flex items-center">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama obat..."
                     class="form-input mr-2">
                 <button type="submit" class="btn btn-secondary mr-2">Cari</button>
-                <a href="{{ route('paramedis.resep.index') }}" class="btn btn-outline-secondary">Tampilkan Semua</a>
+                <a href="{{ route('obat.index') }}" class="btn btn-outline-secondary">Tampilkan Semua</a>
             </form>
         </div>
 

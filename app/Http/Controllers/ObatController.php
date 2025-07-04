@@ -13,7 +13,7 @@ class ObatController extends Controller
     // Tampilkan halaman list obat
     public function index(Request $request)
     {
-        $search = $request->input('search'); // Ambil nilai search dari request
+        $search = $request->input('search');
 
         $obats = Obat::query()
             ->when($search, function ($query) use ($search) {
@@ -21,10 +21,11 @@ class ObatController extends Controller
             })
             ->orderBy('nama_obat')
             ->paginate(10)
-            ->appends(['search' => $search]); // Agar search tetap saat klik pagination
+            ->appends(['search' => $search]);
 
         return view('paramedis.obat.index', compact('obats', 'search'));
     }
+
 
     // Tampilkan form input obat
     public function create()
@@ -55,7 +56,7 @@ class ObatController extends Controller
             'jumlah'        => $obat->stok,
             'sisa_stok'     => $obat->stok,
             'tgl_transaksi' => now(),
-            'tgl_exp'       => $obat->expired_at,
+            'expired_at'       => $obat->expired_at,
             'keterangan'    => 'Input awal obat',
             'ref_type'      => 'obat',
             'ref_id'        => $obat->id,
@@ -113,6 +114,70 @@ class ObatController extends Controller
         $resep->status_diberikan = true;
         $resep->save();
 
+        $obat = $resep->obat;
+        $jumlahKeluar = $resep->jumlah ?? 1;
+
+        // Kurangi stok
+        $obat->stok -= $jumlahKeluar;
+        $obat->save();
+
+        // Simpan ke log_obat
+        LogObat::create([
+            'obat_id' => $obat->id,
+            'jenis_mutasi' => 'keluar',
+            'jumlah' => $jumlahKeluar,
+            'sisa_stok' => $obat->stok,
+            'tgl_transaksi' => now(),
+            'expired_at' => $obat->expired_at,
+            'keterangan' => 'Obat diberikan ke pasien',
+            'ref_type' => 'resep',
+            'ref_id' => $resep->id,
+        ]);
+
         return redirect()->route('paramedis.resep.index')->with('success', 'Obat berhasil diberikan ke pasien.');
+    }
+    public function mutasi(Request $request)
+    {
+        $search = $request->input('search');
+
+        $logObat = LogObat::with('obat')
+            ->when($search, function ($query) use ($search) {
+                $query->whereHas('obat', function ($q) use ($search) {
+                    $q->where('nama_obat', 'like', '%' . $search . '%');
+                });
+            })
+            ->orderByDesc('tgl_transaksi')
+            ->paginate(10);
+
+        return view('paramedis.mutasi.index', compact('logObat'));
+    }
+    public function editLog($id)
+    {
+        $log = LogObat::with('obat')->findOrFail($id);
+        return view('paramedis.mutasi.edit', compact('log'));
+    }
+
+    public function updateLog(Request $request, $id)
+    {
+        $request->validate([
+            'jenis_mutasi' => 'required|in:masuk,keluar',
+            'jumlah' => 'required|integer|min:0',
+            'sisa_stok' => 'required|integer|min:0',
+            'tgl_transaksi' => 'required|date',
+            'expired_at' => 'nullable|date',
+            'keterangan' => 'nullable|string',
+        ]);
+
+        $log = LogObat::findOrFail($id);
+        $log->update($request->only([
+            'jenis_mutasi',
+            'jumlah',
+            'sisa_stok',
+            'tgl_transaksi',
+            'expired_at',
+            'keterangan'
+        ]));
+
+        return redirect()->route('obat.mutasi')->with('success', 'Mutasi obat berhasil diperbarui.');
     }
 }

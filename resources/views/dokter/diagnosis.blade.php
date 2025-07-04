@@ -15,12 +15,11 @@
             </div>
         @endif
 
-        {{-- Jika belum memilih kunjungan --}}
         @if (is_null($kunjungan))
+            {{-- ⚠️ Belum memilih kunjungan --}}
             <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded shadow">
                 <p class="font-semibold text-lg">⚠️ Belum Memilih Kunjungan</p>
-                <p>Silakan pilih kunjungan pasien terlebih dahulu melalui menu <strong>Data Kunjungan</strong> untuk memulai
-                    diagnosis.</p>
+                <p>Silakan pilih kunjungan pasien terlebih dahulu melalui menu <strong>Data Kunjungan</strong>.</p>
             </div>
 
             <div class="mt-4">
@@ -29,13 +28,10 @@
                 </a>
             </div>
         @else
-            {{-- tampilkan form diagnosis --}}
-
-
-            {{-- ✅ Jika kunjungan tersedia --}}
+            {{-- ✅ Detail kunjungan --}}
             <div class="bg-white p-6 rounded-xl shadow space-y-6">
 
-                {{-- 🧾 Informasi Pasien --}}
+                {{-- 👤 Informasi Pasien --}}
                 <div>
                     <h2 class="text-xl font-semibold mb-2">👤 Informasi Pasien</h2>
                     <p><strong>Nama:</strong> {{ $kunjungan->pasien->user->name ?? '-' }}</p>
@@ -46,7 +42,7 @@
                     </p>
                 </div>
 
-                {{-- 🩺 Detail Kunjungan --}}
+                {{-- 🗓️ Detail Kunjungan --}}
                 <div>
                     <h2 class="text-xl font-semibold mb-2">🗓️ Detail Kunjungan</h2>
                     <p><strong>Tanggal Kunjungan:</strong>
@@ -60,8 +56,9 @@
                     </p>
                 </div>
 
-                {{-- 👨‍⚕️ Anamnesa --}}
+                {{-- 📋 Anamnesa --}}
                 @if (!$kunjungan->rekamMedis)
+                    {{-- Belum ada rekam medis, tampilkan form anamnesa --}}
                     <div>
                         <h2 class="text-xl font-semibold mb-2">🩺 Anamnesa Dokter</h2>
                         <form action="{{ route('dokter.rekammedis.store') }}" method="POST" class="space-y-4">
@@ -79,7 +76,7 @@
                         </form>
                     </div>
                 @else
-                    {{-- 🔍 Jika sudah ada rekam medis --}}
+                    {{-- Sudah ada rekam medis --}}
                     <div>
                         <h2 class="text-xl font-semibold mb-2">📋 Anamnesa</h2>
                         <p><strong>Isi Anamnesa:</strong> {{ $kunjungan->rekamMedis->anamnesa ?? '-' }}</p>
@@ -87,45 +84,48 @@
 
                     @php
                         $status = $kunjungan->status;
+                        $rekamMedis = $kunjungan->rekamMedis;
                     @endphp
 
-                    {{-- 🧾 Diagnosis --}}
-                    @if (in_array($status, ['selesai_pemeriksaan_paramedis', 'tindakan_dokter', 'anamnesa_dokter']))
+                    {{-- 🧾 Diagnosis & Tindakan --}}
+                    @if (in_array($status, ['selesai_pemeriksaan_paramedis', 'anamnesa_dokter']) ||
+                            ($status === 'tindakan_dokter' && (!$rekamMedis->diagnosis || !$rekamMedis->tindakan)))
+                        {{-- Tampilkan form diagnosis jika belum diisi --}}
                         <div>
                             <h2 class="text-xl font-semibold mt-6 mb-2">🧾 Diagnosis & Tindakan</h2>
-                            <form action="{{ route('dokter.rekammedis.update', $kunjungan->rekamMedis->id) }}"
-                                method="POST">
+                            <form action="{{ route('dokter.rekammedis.update', $rekamMedis->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
 
                                 <div class="mb-4">
                                     <label class="block font-medium">Diagnosis</label>
-                                    <textarea name="diagnosis" class="w-full border rounded px-3 py-2" required>{{ $kunjungan->rekamMedis->diagnosis }}</textarea>
+                                    <textarea name="diagnosis" class="w-full border rounded px-3 py-2" required>{{ $rekamMedis->diagnosis }}</textarea>
                                 </div>
 
                                 <div class="mb-4">
                                     <label class="block font-medium">Tindakan</label>
-                                    <textarea name="tindakan" class="w-full border rounded px-3 py-2">{{ $kunjungan->rekamMedis->tindakan ?? '' }}</textarea>
+                                    <textarea name="tindakan" class="w-full border rounded px-3 py-2">{{ $rekamMedis->tindakan ?? '' }}</textarea>
                                 </div>
 
                                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
                                     Simpan Diagnosis
                                 </button>
-
-                                @php
-                                    $rekamMedisId = optional($kunjungan->rekamMedis)->id;
-                                @endphp
-
-                                @if ($rekamMedisId && $status === 'tindakan_dokter')
-                                    <div class="mt-4">
-                                        <a href="{{ route('dokter.resep.create', $rekamMedisId) }}"
-                                            class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
-                                            ➕ Tambah Resep Obat
-                                        </a>
-                                    </div>
-                                @endif
-
                             </form>
+                        </div>
+                    @elseif ($status === 'tindakan_dokter' && $rekamMedis->diagnosis && $rekamMedis->tindakan)
+                        {{-- Sudah ada diagnosis dan tindakan, tampilkan sebagai teks --}}
+                        <div>
+                            <h2 class="text-xl font-semibold mt-6 mb-2">🧾 Diagnosis & Tindakan</h2>
+                            <p><strong>Diagnosis:</strong> {{ $rekamMedis->diagnosis }}</p>
+                            <p><strong>Tindakan:</strong> {{ $rekamMedis->tindakan }}</p>
+
+                            {{-- Tombol Tambah Resep Obat --}}
+                            <div class="mt-4">
+                                <a href="{{ route('dokter.resep.create', $rekamMedis->id) }}"
+                                    class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+                                    ➕ Tambah Resep Obat
+                                </a>
+                            </div>
                         </div>
                     @endif
                 @endif
@@ -137,7 +137,8 @@
                         ← Kembali ke Daftar Kunjungan
                     </a>
                 </div>
+
             </div>
-        @endempty
-</div>
+        @endif
+    </div>
 @endsection

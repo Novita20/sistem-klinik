@@ -17,7 +17,7 @@
         @else
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
-                    <thead class="table-dark">
+                    <thead class="table-primary">
                         <tr>
                             <th>No</th>
                             <th>Tanggal</th>
@@ -29,6 +29,7 @@
                     <tbody>
                         @foreach ($riwayat as $kunjungan)
                             <tr>
+                                <td class="px-4 py-2 border">{{ $loop->iteration }}</td>
                                 <td>
                                     {{ \Carbon\Carbon::parse($kunjungan->tgl_kunjungan ?? now())->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
                                 </td>

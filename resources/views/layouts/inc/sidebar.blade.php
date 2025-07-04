@@ -66,6 +66,9 @@
                     </li>
                 @endif
 
+
+
+
                 {{-- PARAMEDIS --}}
                 @if (Auth::check() && Auth::user()->role === 'paramedis')
                     @php
@@ -75,8 +78,9 @@
                             'paramedis.kunjungan.index',
                             'paramedis.kunjungan.riwayat',
                             'paramedis.pemeriksaan.awal',
-                            'rekam.medis',
+                            'paramedis.rekammedis.index',
                             'resep.create',
+                            'paramedis.resep.index',
                         ]);
 
                         $isStokObat = in_array($routeName, [
@@ -121,8 +125,8 @@
                             </li>
 
                             <li class="nav-item">
-                                <a href="{{ route('rekam.medis') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'rekam.medis' ? 'active' : '' }}">
+                                <a href="{{ route('paramedis.rekammedis.index') }}"
+                                    class="nav-link pl-4 {{ $routeName === 'paramedis.rekammedis.index' ? 'active' : '' }}">
                                     <i class="fas fa-file-medical nav-icon"></i>
                                     <p>Rekam Medis (Lihat)</p>
                                 </a>

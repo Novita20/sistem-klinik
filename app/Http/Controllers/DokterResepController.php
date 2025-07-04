@@ -11,10 +11,28 @@ use Illuminate\Support\Facades\Log;
 
 class DokterResepController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $reseps = ResepObat::with(['obat', 'rekamMedis.kunjungan.pasien.user'])->get();
-        return view('dokter.resep.index', compact('reseps'));
+        $search = $request->input('search');
+
+        $reseps = ResepObat::with(['obat', 'rekamMedis.kunjungan.pasien.user'])
+            ->where(function ($query) use ($search) {
+                $query->whereHas('rekamMedis.kunjungan.pasien.user', function ($q) use ($search) {
+                    if ($search) {
+                        $q->where('name', 'like', '%' . $search . '%');
+                    }
+                });
+
+                $query->orWhereHas('obat', function ($q) use ($search) {
+                    if ($search) {
+                        $q->where('nama_obat', 'like', '%' . $search . '%');
+                    }
+                });
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10); // Ubah jumlah per halaman sesuai kebutuhan
+
+        return view('dokter.resep.index', compact('reseps', 'search'));
     }
 
     // 🧾 Form input resep oleh dokter
@@ -73,5 +91,41 @@ class DokterResepController extends Controller
 
         return redirect()->route('dokter.kunjungan.detail', $kunjungan->id)
             ->with('success', 'Resep berhasil disimpan dan kunjungan selesai.');
+    }
+    public function edit($id)
+    {
+        $resep = ResepObat::findOrFail($id);
+        $obat = Obat::all(); // Jika kamu perlu dropdown pilihan obat
+        return view('dokter.resep.edit', compact('resep', 'obat'));
+    }
+
+    public function destroy($id)
+    {
+        ResepObat::destroy($id);
+        return redirect()->route('dokter.resep')->with('success', 'Resep berhasil dihapus.');
+    }
+    public function update(Request $request, $id)
+    {
+        // Validasi input
+        $request->validate([
+            'obat_id' => 'required|exists:obat,id',
+            'jumlah' => 'required|integer|min:1',
+            'dosis' => 'nullable|string|max:255',
+            'aturan_pakai' => 'nullable|string|max:255',
+        ]);
+
+        // Ambil data resep berdasarkan ID
+        $resep = ResepObat::findOrFail($id);
+
+        // Update data resep
+        $resep->update([
+            'obat_id' => $request->obat_id,
+            'jumlah' => $request->jumlah,
+            'dosis' => $request->dosis,
+            'aturan_pakai' => $request->aturan_pakai,
+        ]);
+
+        // Redirect kembali ke halaman index dengan flash message
+        return redirect()->route('dokter.resep')->with('success', 'Resep berhasil diperbarui.');
     }
 }

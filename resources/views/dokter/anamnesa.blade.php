@@ -11,9 +11,15 @@
         @if ($rekamMedis->isEmpty())
             <p class="text-gray-600 italic">Belum ada data anamnesa.</p>
         @else
-            <table class="w-full table-auto border-collapse mt-4">
+            <form method="GET" action="{{ route('dokter.rekammedis.anamnesa') }}" class="mb-4">
+                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pasien..."
+                    class="p-2 border rounded">
+                <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">Cari</button>
+            </form>
+            <table class="min-w-full text-sm border">
                 <thead>
                     <tr class="bg-gray-200 text-left">
+                        <th class="px-4 py-2">No.</th>
                         <th class="px-4 py-2">Tanggal</th>
                         <th class="px-4 py-2">Nama Pasien</th>
                         <th class="px-4 py-2">Anamnesa</th>
@@ -22,6 +28,7 @@
                 <tbody>
                     @foreach ($rekamMedis as $data)
                         <tr class="border-b">
+                            <td class="px-4 py-2">{{ $loop->iteration }}</td>
                             <td class="px-4 py-2">
                                 {{ \Carbon\Carbon::parse($data->created_at)->format('d-m-Y H:i') }}
                             </td>

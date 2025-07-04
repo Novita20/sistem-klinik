@@ -31,11 +31,11 @@ class HasilKunjunganController extends Controller
     /**
      * Menampilkan form rekam medis paramedis untuk kunjungan
      */
-    public function create($kunjunganId)
-    {
-        $kunjungan = Kunjungan::with('pasien.user')->findOrFail($kunjunganId);
-        return view('paramedis.rekam_medis', compact('kunjungan'));
-    }
+    // public function create($kunjunganId)
+    // {
+    //     $kunjungan = Kunjungan::with('pasien.user')->findOrFail($kunjunganId);
+    //     return view('paramedis.rekam_medis', compact('kunjungan'));
+    // }
     /**
      * Menampilkan detail kunjungan
      */
@@ -61,31 +61,31 @@ class HasilKunjunganController extends Controller
     /**
      * Simpan hasil pemeriksaan paramedis ke rekam medis
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'kunjungan_id' => 'required|exists:kunjungan,id',
-            'ttv'          => 'required|string',
-            'diagnosa'     => 'required|string',
-            'tindakan'     => 'required|string',
-            'resep'        => 'nullable|string',
-        ]);
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'kunjungan_id' => 'required|exists:kunjungan,id',
+    //         'ttv'          => 'required|string',
+    //         'diagnosa'     => 'required|string',
+    //         'tindakan'     => 'required|string',
+    //         'resep'        => 'nullable|string',
+    //     ]);
 
-        RekamMedis::create([
-            'kunjungan_id' => $request->kunjungan_id,
-            'ttv'          => $request->ttv,
-            'diagnosa'     => $request->diagnosa,
-            'tindakan'     => $request->tindakan,
-            'resep'        => $request->resep,
-            'paramedis_id' => Auth::id(),
-        ]);
+    //     RekamMedis::create([
+    //         'kunjungan_id' => $request->kunjungan_id,
+    //         'ttv'          => $request->ttv,
+    //         'diagnosa'     => $request->diagnosa,
+    //         'tindakan'     => $request->tindakan,
+    //         'resep'        => $request->resep,
+    //         'paramedis_id' => Auth::id(),
+    //     ]);
 
-        // Perbarui status kunjungan ke selesai_pemeriksaan_paramedis
-        $kunjungan = Kunjungan::findOrFail($request->kunjungan_id);
-        $kunjungan->status = 'selesai_pemeriksaan_paramedis';
-        $kunjungan->save();
+    //     // Perbarui status kunjungan ke selesai_pemeriksaan_paramedis
+    //     $kunjungan = Kunjungan::findOrFail($request->kunjungan_id);
+    //     $kunjungan->status = 'selesai_pemeriksaan_paramedis';
+    //     $kunjungan->save();
 
-        return redirect()->route('paramedis.kunjungan.index')
-            ->with('success', 'Rekam medis berhasil disimpan.');
-    }
+    //     return redirect()->route('paramedis.kunjungan.index')
+    //         ->with('success', 'Rekam medis berhasil disimpan.');
+    // }
 }

@@ -9,12 +9,20 @@
 @section('content')
     <div class="p-6">
         <div class="bg-white p-4 rounded-lg shadow">
-            @if ($kunjungan->isEmpty())
+            @if ($kunjungan->count() === 0)
                 <p class="text-gray-500">Belum ada kunjungan pasien.</p>
             @else
+                <form method="GET" action="{{ route('dokter.kunjungan') }}" class="mb-4">
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pasien..."
+                        class="p-2 border rounded">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Cari</button>
+                </form>
+
                 <table class="min-w-full table-auto border">
                     <thead class="bg-gray-100 text-left">
+
                         <tr>
+                            <th class="px-4 py-2 border">No.</th>
                             <th class="px-4 py-2 border">Nama Pasien</th>
                             <th class="px-4 py-2 border">Tanggal Kunjungan</th>
                             <th class="px-4 py-2 border">Keluhan</th>
@@ -31,6 +39,7 @@
 
                         @foreach ($kunjungan as $k)
                             <tr>
+                                <td class="px-4 py-2">{{ $loop->iteration }}</td>
                                 <td class="px-4 py-2 border">{{ $k->pasien->user->name ?? '-' }}</td>
                                 <td class="px-4 py-2 border">
                                     {{ \Carbon\Carbon::parse($k->tgl_kunjungan)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
@@ -117,6 +126,9 @@
                     </tbody>
 
                 </table>
+                <div class="mt-4">
+                    {{ $kunjungan->links() }}
+                </div>
             @endif
         </div>
     </div>

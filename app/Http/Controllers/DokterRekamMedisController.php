@@ -10,21 +10,37 @@ use Illuminate\Support\Facades\Log;
 class DokterRekamMedisController extends Controller
 {
     // Menampilkan list rekam medis untuk anamnesa
-    public function anamnesa()
+    public function anamnesa(Request $request)
     {
-        $rekamMedis = RekamMedis::with('kunjungan.pasien.user')
-            ->orderByDesc('created_at')
-            ->get();
+        $search = $request->input('search');
 
-        return view('dokter.anamnesa', compact('rekamMedis'));
+        $rekamMedis = RekamMedis::with('kunjungan.pasien.user')
+            ->whereHas('kunjungan.pasien.user', function ($query) use ($search) {
+                if ($search) {
+                    $query->where('name', 'like', '%' . $search . '%');
+                }
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10); // Ganti 10 sesuai jumlah per halaman
+
+        return view('dokter.anamnesa', compact('rekamMedis', 'search'));
     }
 
     // Menampilkan data TTV dari paramedis
-    public function ttv()
+    public function ttv(Request $request)
     {
-        $rekamMedis = RekamMedis::with('kunjungan.pasien.user')->get();
+        $search = $request->input('search');
 
-        return view('dokter.ttv', compact('rekamMedis'));
+        $rekamMedis = RekamMedis::with('kunjungan.pasien.user')
+            ->whereHas('kunjungan.pasien.user', function ($query) use ($search) {
+                if ($search) {
+                    $query->where('name', 'like', '%' . $search . '%');
+                }
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10); // Ganti jumlah item per halaman sesuai kebutuhan
+
+        return view('dokter.ttv', compact('rekamMedis', 'search'));
     }
 
     public function diagnosis(Request $request)

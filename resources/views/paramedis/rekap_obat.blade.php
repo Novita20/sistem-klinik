@@ -21,24 +21,35 @@
                         <th class="p-2">Keluar</th>
                         <th class="p-2">Frekuensi Digunakan</th>
                         <th class="p-2">Rata-rata/Bulan</th>
-                        <th class="p-2">Terakhir Digunakan</th>
-                        <th class="p-2">Exp Terdekat</th>
+                        <th class="p-2">Tanggal Transaksi</th>
+                        <th class="p-2">Tanggal Expired</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach ($data as $index => $obat)
                         <tr class="border-t">
-                            <td class="p-2">{{ $index + 1 }}</td>
-                            <td class="p-2">{{ $obat['nama_obat'] }}</td>
-                            <td class="p-2">{{ $obat['jenis_obat'] }}</td>
-                            <td class="p-2">{{ $obat['satuan'] }}</td>
-                            <td class="p-2">{{ $obat['stok'] }}</td>
-                            <td class="p-2">{{ $obat['total_masuk'] }}</td>
-                            <td class="p-2">{{ $obat['total_keluar'] }}</td>
-                            <td class="p-2">{{ $obat['digunakan'] }} kali</td>
-                            <td class="p-2">{{ $obat['rata_rata_bulanan'] }}</td>
-                            <td class="p-2">{{ $obat['terakhir_digunakan'] ?? '-' }}</td>
-                            <td class="p-2">{{ $obat['exp_terdekat'] ?? '-' }}</td>
+                            <td class="px-4 py-2 border">{{ $index + 1 }}</td>
+                            <td class="px-4 py-2 border">{{ $obat['nama_obat'] }}</td>
+                            <td class="px-4 py-2 border">{{ $obat['jenis_obat'] }}</td>
+                            <td class="px-4 py-2 border">{{ $obat['satuan'] }}</td>
+                            <td class="px-4 py-2 border">{{ $obat['stok'] }}</td>
+                            <td class="px-4 py-2 border">{{ $obat['total_masuk'] }}</td>
+                            <td class="px-4 py-2 border">{{ $obat['total_keluar'] }}</td>
+                            <td class="px-4 py-2 border">{{ $obat['digunakan'] }} kali</td>
+                            <td class="px-4 py-2 border">{{ $obat['rata_rata_bulanan'] }}</td>
+
+                            {{-- Tanggal Transaksi --}}
+                            <td class="px-4 py-2 border">
+                                {{ $obat['terakhir_digunakan'] ? \Carbon\Carbon::parse($obat['terakhir_digunakan'])->format('d-m-Y') : '-' }}
+                            </td>
+
+                            {{-- Tanggal Expired --}}
+                            <td class="px-4 py-2 border" style="color: {{ $obat['expired_color'] ?? 'inherit' }}">
+                                {{ $obat['expired_at'] ? \Carbon\Carbon::parse($obat['expired_at'])->format('d-m-Y') : '-' }}
+                            </td>
+
+
+
                         </tr>
                     @endforeach
                 </tbody>

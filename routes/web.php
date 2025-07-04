@@ -15,6 +15,7 @@ use App\Http\Controllers\K3RestockController;
 use App\Http\Controllers\KunjunganController;
 use App\Http\Controllers\LogObatController;
 use App\Http\Controllers\ObatController;
+use App\Http\Controllers\ParamedisRekamMedisController;
 use App\Http\Controllers\PasienDokterController;
 use App\Http\Controllers\PemeriksaanAwalController;
 use App\Http\Controllers\RekamMedisController;
@@ -92,6 +93,9 @@ Route::middleware('auth')->group(function () {
     // 🩺 REKAM MEDIS (PASIEN)
     // ========================
     Route::get('/rekam-medis', [RekamMedisController::class, 'index'])->name('rekam.medis');
+    // routes/web.php
+    // Route::get('/rekam-medis/{id}/download', [RekamMedisController::class, 'download'])->name('rekam.medis.download');
+
 
     // ========================
     // 💊 RESEP OBAT
@@ -119,8 +123,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/paramedis/kunjungan/hasil', [HasilKunjunganController::class, 'hasil'])->name('paramedis.kunjungan.hasil');
     Route::get('/paramedis/kunjungan/{id}', [HasilKunjunganController::class, 'show'])->name('paramedis.kunjungan.show');
     Route::get('/paramedis/riwayat-kunjungan', [HasilKunjunganController::class, 'riwayat'])->name('paramedis.kunjungan.riwayat');
-    Route::get('/paramedis/rekam-medis/create', [HasilKunjunganController::class, 'create'])->name('paramedis.rekammedis.create');
-    Route::post('/paramedis/rekam-medis/store', [HasilKunjunganController::class, 'store'])->name('paramedis.rekammedis.store');
+    // Route::get('/paramedis/rekam-medis/create', [HasilKunjunganController::class, 'create'])->name('paramedis.rekammedis.create');
+    // Route::post('/paramedis/rekam-medis/store', [HasilKunjunganController::class, 'store'])->name('paramedis.rekammedis.store');
 
 
     // 🩺 PEMERIKSAAN AWAL PARAMEDIS
@@ -130,20 +134,38 @@ Route::middleware('auth')->group(function () {
 
     // // 💊 RESEP OBAT untuk PARAMEDIS (menampilkan semua resep)
 
-    Route::get('/resep', [ResepObatController::class, 'index'])->name('paramedis.resep.index');
-    Route::get('/resep/{id}/edit', [ResepObatController::class, 'edit'])->name('resep.edit');
-    Route::delete('/resep/{id}', [ResepObatController::class, 'destroy'])->name('resep.destroy');
-    Route::put('/resep/{id}', [ResepObatController::class, 'update'])->name('resep.update');
-    Route::get('/resep/create', [ResepObatController::class, 'create'])->name('paramedis.resep.create');
+    Route::get('/paramedis/resep', [ResepObatController::class, 'index'])->name('paramedis.resep.index');
+    Route::get('/paramedis/resep/{id}/edit', [ResepObatController::class, 'edit'])->name('paramedis.resep.edit');
+    Route::delete('/paramedis/resep/{id}', [ResepObatController::class, 'destroy'])->name('paramedis.resep.destroy');
+    Route::put('/paramedis/resep/{id}', [ResepObatController::class, 'update'])->name('paramedis.resep.update');
+    Route::get('/paramedis/resep/create', [ResepObatController::class, 'create'])->name('paramedis.resep.create');
+    Route::post('/resep/{id}/berikan', [ObatController::class, 'berikanObat'])->name('resep.berikan');
 
 
-    //INPUT OBAT DAN MUTASI OBAT
+
+
+    // REKAM MEDIS
+    Route::get('/rekammedis', [ParamedisRekamMedisController::class, 'index'])->name('paramedis.rekammedis.index');
+    Route::get('/rekammedis/create/{kunjunganId}', [ParamedisRekamMedisController::class, 'create'])->name('paramedis.rekammedis.create');
+    Route::post('/rekammedis/store', [ParamedisRekamMedisController::class, 'store'])->name('paramedis.rekammedis.store');
+
+    // ✅ Tambahan route edit, update, destroy
+    Route::get('/rekammedis/{id}/edit', [ParamedisRekamMedisController::class, 'edit'])->name('paramedis.rekammedis.edit');
+    Route::put('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'update'])->name('paramedis.rekammedis.update');
+    Route::delete('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'destroy'])->name('paramedis.rekammedis.destroy');
+
+    //INPUT OBAT 
     Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
     Route::get('/obat/create', [ObatController::class, 'create'])->name('obat.create');
-    Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
-    Route::get('/mutasi-obat', [LogObatController::class, 'mutasi'])->name('obat.mutasi');
-    // Route edit: tampilkan form edit obat
     Route::get('/obat/{id}/edit', [ObatController::class, 'edit'])->name('obat.edit');
+    Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
+
+    //MUTASI OBAT
+    Route::get('/mutasi-obat', [ObatController::class, 'mutasi'])->name('obat.mutasi');
+    Route::get('/paramedis/mutasi/edit/{id}', [ObatController::class, 'editLog'])->name('logobat.edit');
+    Route::put('/paramedis/mutasi/update/{id}', [ObatController::class, 'updateLog'])->name('logobat.update');
+
+
 
     // Route update: simpan perubahan data obat
     Route::put('/obat/{id}', [ObatController::class, 'update'])->name('obat.update');
@@ -198,6 +220,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/dokter/resep/buat/{rekam_medis_id}', [DokterResepController::class, 'create'])->name('dokter.resep.create');
     Route::post('/dokter/resep/simpan', [DokterResepController::class, 'store'])->name('dokter.resep.store');
     Route::get('/dokter/resep/lihat/{rekam_medis_id}', [DokterResepController::class, 'showByRekamMedis'])->name('dokter.resep.show');
+    Route::get('/resep/{id}/edit', [DokterResepController::class, 'edit'])->name('dokter.resep.edit');
+    Route::delete('/resep/{id}', [DokterResepController::class, 'destroy'])->name('dokter.resep.destroy');
+    Route::put('/dokter/resep/{id}', [DokterResepController::class, 'update'])->name('dokter.resep.update');
+
+
 
 
     //K3

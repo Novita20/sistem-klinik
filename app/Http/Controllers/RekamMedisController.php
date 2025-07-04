@@ -5,37 +5,50 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Kunjungan;
+
+
 use App\Models\RekamMedis;
 
 class RekamMedisController extends Controller
 {
     /**
-     * Tampilkan rekam medis untuk pasien yang sedang login
+     * Menampilkan daftar rekam medis milik pasien yang sedang login.
+     * Hanya untuk role "pasien".
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
 
-        // Ambil kunjungan pasien beserta data rekam medis (jika ada)
-        $rekamMedis = Kunjungan::with('rekamMedis')
-            ->where('pasien_id', $user->id)
-            ->orderBy('tgl_kunjungan', 'desc')
-            ->get();
+        // Cari ID pasien dari user_id yang sedang login
+        $pasienId = \App\Models\Pasien::where('user_id', $user->id)->value('id');
 
-        return view('pasien.rm', compact('rekamMedis'));
+        $rekammedis = RekamMedis::with([
+            'kunjungan.pasien.user',
+            'kunjungan',
+            'resepObat.obat'
+        ])
+            ->whereHas('kunjungan', function ($query) use ($pasienId) {
+                $query->where('pasien_id', $pasienId);
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('pasien.rm', compact('rekammedis'));
     }
 
+
     /**
-     * Simpan data rekam medis dari dokter
+     * Menyimpan data rekam medis.
+     * Hanya digunakan oleh dokter saat menangani pasien.
      */
     public function store(Request $request)
     {
         $request->validate([
             'kunjungan_id' => 'required|exists:kunjungan,id',
-            'ttv'          => 'required|string',
+            'ttv'          => 'required|string', // disimpan dalam bentuk JSON
             'diagnosa'     => 'required|string',
             'tindakan'     => 'required|string',
-            'resep'        => 'nullable|string',
+            'resep'        => 'nullable|string', // kalau tidak pakai model resep terpisah
         ]);
 
         RekamMedis::create([
@@ -43,11 +56,12 @@ class RekamMedisController extends Controller
             'ttv'          => $request->ttv,
             'diagnosa'     => $request->diagnosa,
             'tindakan'     => $request->tindakan,
-            'resep'        => $request->resep,
-            'dokter_id'    => auth()->id(),
-            'paramedis_id' => null,
+            'resep'        => $request->resep, // kolom opsional
+            'dokter_id' => Auth::id(),
+            'paramedis_id' => null, // karena disimpan oleh dokter
         ]);
 
+        // Update status kunjungan menjadi 'sudah ditangani'
         Kunjungan::findOrFail($request->kunjungan_id)->update([
             'status' => 'sudah ditangani'
         ]);

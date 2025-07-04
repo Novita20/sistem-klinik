@@ -26,9 +26,10 @@
                         <th class="px-4 py-2 border">Nama Obat</th>
                         <th class="px-4 py-2 border">Jenis Mutasi</th>
                         <th class="px-4 py-2 border">Jumlah</th>
-                        <th class="px-4 py-2 border">Sisa Stok</th>
+                        <th class="px-4 py-2 border">Stok Awal</th>
+                        <th class="px-4 py-2 border">Sisa Stok Sekarang</th>
                         <th class="px-4 py-2 border">Tanggal Transaksi</th>
-                        <th class="px-4 py-2 border">Tanggal Exp</th>
+                        <th class="px-4 py-2 border">Tanggal Expired</th>
                         <th class="px-4 py-2 border">Keterangan</th>
                         <th class="px-4 py-2 border">Referensi</th>
                         <th class="px-4 py-2 border">Aksi</th>
@@ -41,12 +42,42 @@
                             <td class="px-4 py-2 border">{{ $log->obat->nama_obat ?? '-' }}</td>
                             <td class="px-4 py-2 border">{{ ucfirst($log->jenis_mutasi) }}</td>
                             <td class="px-4 py-2 border">{{ $log->jumlah }}</td>
-                            <td class="px-4 py-2 border">{{ $log->sisa_stok }}</td>
-                            <td class="px-4 py-2 border">{{ \Carbon\Carbon::parse($log->tgl_transaksi)->format('d-m-Y') }}
+
+
+                            @php
+                                // Hitung stok awal berdasarkan jenis mutasi
+                                $stokAwal =
+                                    $log->jenis_mutasi === 'keluar'
+                                        ? $log->sisa_stok + $log->jumlah // Kalau keluar, stok awal = sisa + jumlah keluar
+                                        : $log->sisa_stok - $log->jumlah; // Kalau masuk, stok awal = sisa - jumlah masuk
+
+                                // Hitung sisa stok hasil dari stok awal agar sesuai logika
+                                $sisaStok =
+                                    $log->jenis_mutasi === 'keluar'
+                                        ? $stokAwal - $log->jumlah
+                                        : $stokAwal + $log->jumlah;
+                            @endphp
+
+                            <td class="px-4 py-2 border">
+                                {{ $stokAwal }}
+                            </td>
+
+                            <td class="px-4 py-2 border">
+                                {{ $sisaStok }}
+                            </td>
+
+
+                            {{-- <td class="px-4 py-2 border">
+                                {{ $log->obat->stok }}
+                            </td> --}}
+
+                            <td class="px-4 py-2 border">
+                                {{ \Carbon\Carbon::parse($log->tgl_transaksi)->format('d-m-Y') }}
                             </td>
                             <td class="px-4 py-2 border">
-                                {{ $log->tgl_exp ? \Carbon\Carbon::parse($log->tgl_exp)->format('d-m-Y') : '-' }}
+                                {{ $log->obat->expired_at ? \Carbon\Carbon::parse($log->obat->expired_at)->format('d-m-Y') : '-' }}
                             </td>
+
                             <td class="px-4 py-2 border">{{ $log->keterangan }}</td>
                             <td class="px-4 py-2 border">
                                 {{ $log->ref_type ? ucfirst($log->ref_type) . ' #' . $log->ref_id : '-' }}
@@ -60,7 +91,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center py-4 text-gray-500">Tidak ada data mutasi obat.</td>
+                            <td colspan="11" class="text-center py-4 text-gray-500">Tidak ada data mutasi obat.</td>
                         </tr>
                     @endforelse
                 </tbody>
