@@ -11,7 +11,7 @@
             </div>
         @else
             <div class="overflow-x-auto bg-white rounded shadow-sm">
-                <table class="min-w-full border border-gray-300 ">
+                <table class="min-w-full border border-gray-300">
                     <thead class="bg-gray-100 text-gray-700 text-center">
                         <tr>
                             <th class="px-4 py-2 border">No</th>
@@ -46,21 +46,25 @@
                                         ? \Carbon\Carbon::parse($resep->logObat->tgl_transaksi)->format('d-m-Y H:i')
                                         : '-' }}
                                 </td>
-
                                 <td class="border px-4 py-2">
+                                    {{-- ✅ Tombol Berikan --}}
                                     @if (!$resep->status_diberikan)
-                                        <form action="{{ route('resep.berikan', $resep->id) }}" method="POST"
+                                        <form action="{{ route('paramedis.resep.berikan', ['id' => $resep->id]) }}"
+                                            method="POST" style="display:inline-block;"
                                             onsubmit="return confirm('Yakin ingin memberikan obat ini?');">
                                             @csrf
                                             <button type="submit"
-                                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded">
+                                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
+                                                style="z-index:1; position:relative;">
                                                 Berikan
                                             </button>
                                         </form>
                                     @else
-                                        <span class="text-green-600 font-semibold">Sudah Diberikan</span>
+                                        <span class="text-green-600 font-semibold text-sm">✅ Sudah Diberikan</span>
                                     @endif
-                                    <div class="flex justify-center space-x-2">
+
+                                    {{-- ✅ Tombol Edit & Hapus --}}
+                                    <div class="flex justify-center space-x-2 mt-2">
                                         <a href="{{ route('paramedis.resep.edit', $resep->id) }}"
                                             class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm">
                                             Edit

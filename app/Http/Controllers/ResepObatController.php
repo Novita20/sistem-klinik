@@ -6,13 +6,13 @@ use App\Models\Obat;
 use App\Models\Pasien;
 use App\Models\RekamMedis;
 use App\Models\ResepObat;
-
+use App\Models\LogObat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ResepObatController extends Controller
 {
-    // ✅ Paramedis: Menampilkan semua resep obat (dengan search & pagination)
+    // Menampilkan semua resep obat
     public function index(Request $request)
     {
         $query = ResepObat::with([
@@ -33,7 +33,7 @@ class ResepObatController extends Controller
         return view('paramedis.resep.index', compact('resepObat'));
     }
 
-    // ✅ Paramedis: Form tambah resep obat
+    // Form tambah resep
     public function create()
     {
         $rekamMedis = RekamMedis::with('kunjungan.user')->get();
@@ -42,7 +42,7 @@ class ResepObatController extends Controller
         return view('paramedis.resep.create', compact('rekamMedis', 'obats'));
     }
 
-    // ✅ Paramedis: Simpan resep baru
+    // Simpan resep baru & catat mutasi
     public function store(Request $request)
     {
         $request->validate([
@@ -56,16 +56,12 @@ class ResepObatController extends Controller
 
         $obat = Obat::findOrFail($request->obat_id);
 
-        // Cek stok
         if ($request->jumlah > $obat->stok) {
             return back()->withErrors(['jumlah' => 'Jumlah melebihi stok obat']);
         }
 
-        // Kurangi stok
-        $obat->stok -= $request->jumlah;
-        $obat->save();
 
-        // Ambil rekam medis & pasien
+
         $rekamMedis = RekamMedis::with('kunjungan.user.pasien')->findOrFail($request->rekam_medis_id);
         $pasien = optional(optional($rekamMedis->kunjungan)->user)->pasien;
 
@@ -73,8 +69,7 @@ class ResepObatController extends Controller
             return back()->withErrors(['rekam_medis_id' => 'Data pasien tidak ditemukan']);
         }
 
-        // Simpan resep
-        ResepObat::create([
+        $resep = ResepObat::create([
             'rekam_medis_id' => $request->rekam_medis_id,
             'obat_id'        => $request->obat_id,
             'jumlah'         => $request->jumlah,
@@ -82,15 +77,16 @@ class ResepObatController extends Controller
             'aturan_pakai'   => $request->aturan_pakai,
             'keterangan'     => $request->keterangan,
             'pasien_id'      => $pasien->id,
+            'status_diberikan' => false,
         ]);
 
-        // Ubah status kunjungan menjadi selesai
+
         optional($rekamMedis->kunjungan)->update(['status' => 'selesai']);
 
-        return redirect()->route('paramedis.resep.index')->with('success', 'Resep berhasil disimpan.');
+        return redirect()->route('paramedis.resep.index')->with('success', 'Resep berhasil disimpan & dicatat.');
     }
 
-    // ✅ Edit resep
+    // Edit resep
     public function edit($id)
     {
         $resep = ResepObat::findOrFail($id);
@@ -100,7 +96,7 @@ class ResepObatController extends Controller
         return view('paramedis.resep.edit', compact('resep', 'obats', 'rekamMedis'));
     }
 
-    // ✅ Update resep
+    // Update resep
     public function update(Request $request, $id)
     {
         $request->validate([
@@ -121,30 +117,71 @@ class ResepObatController extends Controller
         return redirect()->route('paramedis.resep.index')->with('success', 'Resep berhasil diperbarui.');
     }
 
-    // ✅ Hapus resep
+    // Hapus resep
     public function destroy($id)
     {
         $resep = ResepObat::findOrFail($id);
         $resep->delete();
 
-        return redirect()->route('paramedis.resep.destroy')->with('success', 'Resep berhasil dihapus.');
+        return redirect()->route('paramedis.resep.index')->with('success', 'Resep berhasil dihapus.');
     }
 
-    // 👤 Pasien: Menampilkan resep miliknya
+    // Pasien: Lihat resep miliknya
     public function indexResep()
     {
         $user = Auth::user();
         $pasien = Pasien::where('user_id', $user->id)->first();
 
-        if ($pasien) {
-            $resepObat = ResepObat::where('pasien_id', $pasien->id)
-                ->with('obat', 'rekamMedis.kunjungan')
-                ->latest()
-                ->get();
-        } else {
-            $resepObat = collect();
-        }
+        $resepObat = $pasien
+            ? ResepObat::where('pasien_id', $pasien->id)->with('obat', 'rekamMedis.kunjungan')->latest()->get()
+            : collect();
 
         return view('pasien.resep', compact('resepObat'));
+    }
+
+    // Opsional: Kalau mau pisahkan aksi "berikan obat" dari create
+    public function berikanObat($id)
+    {
+        // Ambil data resep dan relasi obat
+        $resep = ResepObat::with('obat')->findOrFail($id);
+
+        // Cegah jika obat sudah diberikan sebelumnya
+        if ($resep->status_diberikan) {
+            return redirect()->back()->with('warning', 'Obat sudah diberikan sebelumnya.');
+        }
+
+        // Ambil data obat terkait
+        $obat = $resep->obat;
+
+        // Cek apakah stok cukup
+        if (!$obat || $obat->stok < $resep->jumlah) {
+            return redirect()->back()->with('error', 'Stok obat tidak mencukupi atau data obat tidak ditemukan.');
+        }
+
+        // ✅ Simpan stok awal SEBELUM dikurangi
+        $stokAwal = $obat->stok;
+
+        // Kurangi stok
+        $obat->stok -= $resep->jumlah;
+        $obat->save();
+
+        // Update status resep menjadi "sudah diberikan"
+        $resep->update(['status_diberikan' => true]);
+
+        // ✅ Catat mutasi di log_obat
+        LogObat::create([
+            'obat_id'      => $obat->id,
+            'jenis_mutasi' => 'keluar',
+            'jumlah'       => $resep->jumlah,
+            'stok_awal'    => $stokAwal,       // Nilai sebelum dikurangi
+            'sisa_stok'    => $obat->stok,     // Nilai setelah dikurangi
+            'tgl_transaksi' => now(),
+            'expired_at'   => $obat->expired_at,
+            'keterangan'   => 'Obat diberikan ke pasien (melalui aksi Berikan)',
+            'ref_type'     => 'resep',
+            'ref_id'       => $resep->id,
+        ]);
+
+        return redirect()->route('paramedis.resep.index')->with('success', 'Obat berhasil diberikan & dicatat.');
     }
 }

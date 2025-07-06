@@ -32,6 +32,28 @@
 <!-- AdminLTE for demo purposes -->
 {{-- <script src="{{ url('assets/dist/js/demo.js') }}"></script> --}}
 
+<!-- Treeview Init -->
+{{-- <script>
+    $(document).ready(function () {
+        $('.nav-item.has-treeview > a').on('click', function (e) {
+            e.preventDefault();
+            var $parent = $(this).parent();
+            $parent.toggleClass('menu-open');
+            $parent.find('.nav-treeview').first().slideToggle();
+        });
+    });
+</script> --}}
+
+
+@stack('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $('[data-widget="treeview"]').each(function() {
+            $(this).Treeview('init');
+        });
+    });
+</script>
+
 
 <!-- Page specific script -->
 <!-- Tambahkan script DataTables user -->
@@ -345,6 +367,30 @@
                     }
                 }
             });
+        });
+    </script>
+
+    <script>
+        $('body').on('click', '.nav-item.has-treeview > a', function(e) {
+            e.preventDefault();
+            let $parent = $(this).parent();
+            let $treeviewMenu = $parent.find('.nav-treeview').first();
+
+            // Tutup semua menu lain
+            $('.nav-item.has-treeview.menu-open').not($parent).each(function() {
+                $(this).removeClass('menu-open').find('.nav-treeview').slideUp(200);
+            });
+
+            // Toggle menu yang diklik
+            if ($parent.hasClass('menu-open')) {
+                $treeviewMenu.slideUp(200, function() {
+                    $parent.removeClass('menu-open');
+                });
+            } else {
+                $treeviewMenu.slideDown(200, function() {
+                    $parent.addClass('menu-open');
+                });
+            }
         });
     </script>
 @endif

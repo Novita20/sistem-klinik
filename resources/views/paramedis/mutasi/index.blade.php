@@ -8,7 +8,7 @@
 
 @section('content')
     <div class="p-6">
-        {{-- Search --}}
+        {{-- 🔍 Search --}}
         <div class="mb-4 flex justify-end">
             <form action="{{ route('obat.mutasi') }}" method="GET" class="flex items-center">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama obat..."
@@ -17,7 +17,7 @@
             </form>
         </div>
 
-        {{-- Tabel --}}
+        {{-- 📊 Tabel Mutasi --}}
         <div class="bg-white p-4 rounded-xl shadow-md overflow-auto">
             <table class="min-w-full text-sm text-left border border-gray-200">
                 <thead class="bg-gray-100 text-gray-700">
@@ -27,7 +27,7 @@
                         <th class="px-4 py-2 border">Jenis Mutasi</th>
                         <th class="px-4 py-2 border">Jumlah</th>
                         <th class="px-4 py-2 border">Stok Awal</th>
-                        <th class="px-4 py-2 border">Sisa Stok Sekarang</th>
+                        <th class="px-4 py-2 border">Sisa Stok</th>
                         <th class="px-4 py-2 border">Tanggal Transaksi</th>
                         <th class="px-4 py-2 border">Tanggal Expired</th>
                         <th class="px-4 py-2 border">Keterangan</th>
@@ -42,43 +42,15 @@
                             <td class="px-4 py-2 border">{{ $log->obat->nama_obat ?? '-' }}</td>
                             <td class="px-4 py-2 border">{{ ucfirst($log->jenis_mutasi) }}</td>
                             <td class="px-4 py-2 border">{{ $log->jumlah }}</td>
-
-
-                            @php
-                                // Hitung stok awal berdasarkan jenis mutasi
-                                $stokAwal =
-                                    $log->jenis_mutasi === 'keluar'
-                                        ? $log->sisa_stok + $log->jumlah // Kalau keluar, stok awal = sisa + jumlah keluar
-                                        : $log->sisa_stok - $log->jumlah; // Kalau masuk, stok awal = sisa - jumlah masuk
-
-                                // Hitung sisa stok hasil dari stok awal agar sesuai logika
-                                $sisaStok =
-                                    $log->jenis_mutasi === 'keluar'
-                                        ? $stokAwal - $log->jumlah
-                                        : $stokAwal + $log->jumlah;
-                            @endphp
-
-                            <td class="px-4 py-2 border">
-                                {{ $stokAwal }}
-                            </td>
-
-                            <td class="px-4 py-2 border">
-                                {{ $sisaStok }}
-                            </td>
-
-
-                            {{-- <td class="px-4 py-2 border">
-                                {{ $log->obat->stok }}
-                            </td> --}}
-
+                            <td class="px-4 py-2 border">{{ $log->stok_awal ?? '0' }}</td>
+                            <td class="px-4 py-2 border">{{ $log->sisa_stok ?? '-' }}</td>
                             <td class="px-4 py-2 border">
                                 {{ \Carbon\Carbon::parse($log->tgl_transaksi)->format('d-m-Y') }}
                             </td>
                             <td class="px-4 py-2 border">
-                                {{ $log->obat->expired_at ? \Carbon\Carbon::parse($log->obat->expired_at)->format('d-m-Y') : '-' }}
+                                {{ $log->expired_at ? \Carbon\Carbon::parse($log->expired_at)->format('d-m-Y') : '-' }}
                             </td>
-
-                            <td class="px-4 py-2 border">{{ $log->keterangan }}</td>
+                            <td class="px-4 py-2 border">{{ $log->keterangan ?? '-' }}</td>
                             <td class="px-4 py-2 border">
                                 {{ $log->ref_type ? ucfirst($log->ref_type) . ' #' . $log->ref_id : '-' }}
                             </td>
@@ -95,9 +67,10 @@
                         </tr>
                     @endforelse
                 </tbody>
+
             </table>
 
-            {{-- Pagination --}}
+            {{-- 📄 Pagination --}}
             <div class="mt-4">
                 {{ $logObat->links() }}
             </div>

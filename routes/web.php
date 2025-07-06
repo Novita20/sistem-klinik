@@ -139,7 +139,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/paramedis/resep/{id}', [ResepObatController::class, 'destroy'])->name('paramedis.resep.destroy');
     Route::put('/paramedis/resep/{id}', [ResepObatController::class, 'update'])->name('paramedis.resep.update');
     Route::get('/paramedis/resep/create', [ResepObatController::class, 'create'])->name('paramedis.resep.create');
-    Route::post('/resep/{id}/berikan', [ObatController::class, 'berikanObat'])->name('resep.berikan');
+    Route::post('/resep-obat/berikan/{id}', [ResepObatController::class, 'berikanObat'])->name('paramedis.resep.berikan');
+
+    // Route::post('/resep/{id}/berikan', [ObatController::class, 'berikanObat'])->name('resep.berikan');
 
 
 
@@ -154,7 +156,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'update'])->name('paramedis.rekammedis.update');
     Route::delete('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'destroy'])->name('paramedis.rekammedis.destroy');
 
-    //INPUT OBAT 
+    //INPUT OBAT
     Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
     Route::get('/obat/create', [ObatController::class, 'create'])->name('obat.create');
     Route::get('/obat/{id}/edit', [ObatController::class, 'edit'])->name('obat.edit');

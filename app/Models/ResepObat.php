@@ -18,8 +18,12 @@ class ResepObat extends Model
         'dosis',
         'aturan_pakai',
         'pasien_id',
+        'keterangan',
+        'status_diberikan', // ✅ Tambahkan ini
     ];
-
+    protected $casts = [
+        'status_diberikan' => 'boolean', // ✅ agar otomatis casting true/false
+    ];
 
     /**
      * Relasi ke rekam medis

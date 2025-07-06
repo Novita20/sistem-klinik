@@ -3,6 +3,16 @@
 
     <!-- Left navbar links -->
     <ul class="navbar-nav pl-4">
+
+        {{-- 🔄 Tombol Toggle Sidebar --}}
+        @if (!isset($hideSidebar) || !$hideSidebar)
+            <li class="nav-item">
+                <a class="nav-link text-white" data-widget="pushmenu" href="#" role="button">
+                    <i class="fas fa-bars"></i>
+                </a>
+            </li>
+        @endif
+
         <li class="nav-item d-none d-sm-inline-block">
             <a class="nav-link font-weight-bold text-white text-lg tracking-wide" href="#">
                 KLINIK
@@ -80,8 +90,6 @@
                     Masuk
                 </a>
             </li>
-
-
         @endif
     </ul>
 </nav>

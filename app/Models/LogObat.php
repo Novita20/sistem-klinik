@@ -15,14 +15,14 @@ class LogObat extends Model
         'obat_id',
         'jenis_mutasi',
         'jumlah',
+        'stok_awal',
         'sisa_stok',
         'tgl_transaksi',
-        'tgl_exp',
+        'expired_at',
         'keterangan',
         'ref_type',
         'ref_id',
     ];
-
     /**
      * Relasi ke model Obat
      */
@@ -41,5 +41,9 @@ class LogObat extends Model
             'restock' => $this->belongsTo(RestockObat::class, 'ref_id'),
             default => null,
         };
+    }
+    public function resep()
+    {
+        return $this->belongsTo(ResepObat::class, 'ref_id');
     }
 }

@@ -34,7 +34,6 @@ class ObatController extends Controller
         return view('paramedis.obat.create');
     }
 
-
     public function store(Request $request)
     {
         $request->validate([
@@ -45,25 +44,24 @@ class ObatController extends Controller
             'expired_at'  => 'required|date',
         ]);
 
-        // Simpan obat
         $obat = Obat::create($request->all());
 
-        // Catat ke mutasi (log_obat)
         LogObat::create([
-
-            'obat_id'       => $obat->id,
-            'jenis_mutasi'  => 'masuk',
-            'jumlah'        => $obat->stok,
-            'sisa_stok'     => $obat->stok,
+            'obat_id' => $obat->id,
+            'jenis_mutasi' => 'masuk',
+            'jumlah' => $obat->stok,
+            'stok_awal' => $obat->stok,
+            'sisa_stok' => $obat->stok,
             'tgl_transaksi' => now(),
-            'expired_at'       => $obat->expired_at,
-            'keterangan'    => 'Input awal obat',
-            'ref_type'      => 'obat',
-            'ref_id'        => $obat->id,
+            'expired_at' => $obat->expired_at, // ✅ pastikan ini kolomnya benar
+            'keterangan' => 'Input awal obat',
+            'ref_type' => 'obat',
+            'ref_id' => $obat->id,
         ]);
 
         return redirect()->route('obat.index')->with('success', 'Data obat berhasil disimpan.');
     }
+
     // Tampilkan form edit
     public function edit($id)
     {
@@ -73,7 +71,6 @@ class ObatController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
         $request->validate([
             'nama_obat'   => 'required|string|max:255',
             'jenis_obat'  => 'required|string|max:255',
@@ -83,100 +80,98 @@ class ObatController extends Controller
         ]);
 
         $obat = Obat::findOrFail($id);
+        $stokLama = $obat->stok;
 
-        // HANYA update field yang diizinkan
-        $obat->update([
-            'nama_obat'   => $request->nama_obat,
-            'jenis_obat'  => $request->jenis_obat,
-            'stok'        => $request->stok,
-            'satuan'      => $request->satuan,
-            'expired_at'  => $request->expired_at,
-        ]);
+        $obat->update($request->only(['nama_obat', 'jenis_obat', 'stok', 'satuan', 'expired_at']));
+
+        if ($stokLama !== $request->stok) {
+            LogObat::create([
+                'obat_id' => $obat->id,
+                'jenis_mutasi' => $request->stok > $stokLama ? 'masuk' : 'keluar',
+                'jumlah' => abs($request->stok - $stokLama),
+                'stok_awal' => $stokLama,
+                'sisa_stok' => $request->stok,
+                'tgl_transaksi' => now(),
+                'expired_at' => $obat->expired_at, // ✅ gunakan dari $obat
+                'keterangan' => 'Penyesuaian stok saat edit',
+                'ref_type' => 'obat',
+                'ref_id' => $obat->id,
+            ]);
+        }
 
         return redirect()->route('obat.index')->with('success', 'Data obat berhasil diperbarui.');
     }
-    public function indexResep()
-    {
-        dd('masuk sini');
 
-        $resepObat = ResepObat::with([
-            'rekamMedis.kunjungan.user.pasien',
-            'obat'
-        ])->latest()->get();
+    // public function indexResep()
+    // {
+    //     dd('masuk sini');
 
-        return view('paramedis.resep.index', compact('resepObat'));
-    }
+    //     $resepObat = ResepObat::with([
+    //         'rekamMedis.kunjungan.user.pasien',
+    //         'obat'
+    //     ])->latest()->get();
+
+    //     return view('paramedis.resep.index', compact('resepObat'));
+    // }
 
 
-    public function berikanObat($id)
-    {
-        $resep = ResepObat::findOrFail($id);
-        $resep->status_diberikan = true;
-        $resep->save();
-
-        $obat = $resep->obat;
-        $jumlahKeluar = $resep->jumlah ?? 1;
-
-        // Kurangi stok
-        $obat->stok -= $jumlahKeluar;
-        $obat->save();
-
-        // Simpan ke log_obat
-        LogObat::create([
-            'obat_id' => $obat->id,
-            'jenis_mutasi' => 'keluar',
-            'jumlah' => $jumlahKeluar,
-            'sisa_stok' => $obat->stok,
-            'tgl_transaksi' => now(),
-            'expired_at' => $obat->expired_at,
-            'keterangan' => 'Obat diberikan ke pasien',
-            'ref_type' => 'resep',
-            'ref_id' => $resep->id,
-        ]);
-
-        return redirect()->route('paramedis.resep.index')->with('success', 'Obat berhasil diberikan ke pasien.');
-    }
     public function mutasi(Request $request)
     {
         $search = $request->input('search');
 
-        $logObat = LogObat::with('obat')
+        $logObat = LogObat::with(['obat', 'resep'])
             ->when($search, function ($query) use ($search) {
                 $query->whereHas('obat', function ($q) use ($search) {
                     $q->where('nama_obat', 'like', '%' . $search . '%');
                 });
+            })
+            ->where(function ($q) {
+                $q->where('ref_type', 'obat')
+                    ->orWhere(function ($q2) {
+                        $q2->where('ref_type', 'resep')
+                            ->whereIn('ref_id', function ($subQuery) {
+                                $subQuery->select('id')
+                                    ->from('resep_obat')
+                                    ->where('status_diberikan', true);
+                            });
+                    });
             })
             ->orderByDesc('tgl_transaksi')
             ->paginate(10);
 
         return view('paramedis.mutasi.index', compact('logObat'));
     }
+
+
+
     public function editLog($id)
     {
         $log = LogObat::with('obat')->findOrFail($id);
         return view('paramedis.mutasi.edit', compact('log'));
     }
-
     public function updateLog(Request $request, $id)
     {
         $request->validate([
-            'jenis_mutasi' => 'required|in:masuk,keluar',
-            'jumlah' => 'required|integer|min:0',
-            'sisa_stok' => 'required|integer|min:0',
+            'jenis_mutasi'  => 'required|in:masuk,keluar',
+            'jumlah'        => 'required|integer|min:0',
+            'stok_awal'     => 'required|integer|min:0',
+            'sisa_stok'     => 'required|integer|min:0',
             'tgl_transaksi' => 'required|date',
-            'expired_at' => 'nullable|date',
-            'keterangan' => 'nullable|string',
+            'expired_at'    => 'nullable|date',
+            'keterangan'    => 'nullable|string',
         ]);
 
         $log = LogObat::findOrFail($id);
-        $log->update($request->only([
-            'jenis_mutasi',
-            'jumlah',
-            'sisa_stok',
-            'tgl_transaksi',
-            'expired_at',
-            'keterangan'
-        ]));
+
+        $log->update([
+            'jenis_mutasi'  => $request->jenis_mutasi,
+            'jumlah'        => $request->jumlah,
+            'stok_awal'     => $request->stok_awal,
+            'sisa_stok'     => $request->sisa_stok,
+            'tgl_transaksi' => $request->tgl_transaksi,
+            'expired_at'    => $request->expired_at,
+            'keterangan'    => $request->keterangan,
+        ]);
 
         return redirect()->route('obat.mutasi')->with('success', 'Mutasi obat berhasil diperbarui.');
     }

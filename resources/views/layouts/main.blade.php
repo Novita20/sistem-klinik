@@ -29,7 +29,7 @@
         @endif
 
         <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper {{ isset($hideSidebar) && $hideSidebar ? 'ml-0' : 'ml-64' }}">
+        <div class="content-wrapper">
             <!-- Content Header (Page header) -->
             <section class="content-header">
                 @yield('content-header')
