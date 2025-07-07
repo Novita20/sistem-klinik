@@ -13,10 +13,9 @@ class RestockObat extends Model
 
     protected $fillable = [
         'obat_id',
-        'requested_by',
-        'approved_by',
         'jumlah',
         'status',
+        'tanggal_pengajuan',
     ];
 
     /**

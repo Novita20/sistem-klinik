@@ -6,16 +6,16 @@ use App\Models\Obat;
 use App\Models\RestockObat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class RestockObatController extends Controller
 {
     /**
-     * Paramedis - Menampilkan daftar pengajuan restock milik sendiri
+     * Paramedis - Menampilkan daftar pengajuan restock (tanpa requested_by)
      */
     public function index()
     {
         $pengajuan = RestockObat::with('obat')
-            ->where('requested_by', Auth::id())
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -40,26 +40,28 @@ class RestockObatController extends Controller
         $request->validate([
             'obat_id' => 'required|exists:obat,id',
             'jumlah' => 'required|integer|min:1',
+            'tanggal_pengajuan' => 'required|date',
         ]);
 
         RestockObat::create([
             'obat_id' => $request->obat_id,
             'jumlah' => $request->jumlah,
             'status' => 'diajukan',
-            'requested_by' => Auth::id(),
-            'approved_by' => null,
+            'tanggal_pengajuan' => Carbon::createFromFormat('Y-m-d\TH:i', $request->tanggal_pengajuan, 'Asia/Jakarta')->setTimezone('UTC'),
+
         ]);
 
         return redirect()->route('paramedis.restock.index')
             ->with('success', 'Pengajuan berhasil dikirim ke K3.');
     }
 
+
     /**
      * K3 - Menampilkan daftar pengajuan yang masuk untuk disetujui
      */
     public function approvalIndex()
     {
-        $pengajuan = RestockObat::with(['obat', 'requestedBy'])
+        $pengajuan = RestockObat::with('obat')
             ->where('status', 'diajukan')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -79,7 +81,6 @@ class RestockObatController extends Controller
         $restock = RestockObat::findOrFail($id);
         $restock->update([
             'status' => $request->status,
-            'approved_by' => Auth::id(),
         ]);
 
         return redirect()->route('k3.restock.index')

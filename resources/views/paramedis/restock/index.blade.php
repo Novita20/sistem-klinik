@@ -25,8 +25,7 @@
                             <th>Nama Obat</th>
                             <th>Jumlah</th>
                             <th>Status</th>
-                            <th>Disetujui Oleh</th>
-                            <th>Tanggal</th>
+                            <th>Tanggal Pengajuan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -44,8 +43,14 @@
                                         <span class="badge bg-danger">Ditolak</span>
                                     @endif
                                 </td>
-                                <td>{{ $item->approvedBy->name ?? '-' }}</td>
-                                <td>{{ $item->created_at->format('d M Y H:i') }}</td>
+
+                                <td>
+                                    {{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->timezone('Asia/Jakarta')->format('d M Y H:i') }}
+                                </td>
+
+
+
+
                             </tr>
                         @empty
                             <tr>
