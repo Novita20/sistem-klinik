@@ -80,6 +80,22 @@ class ResepObatController extends Controller
             'status_diberikan' => false,
         ]);
 
+        // ✅ Kurangi stok obat
+        $stokAwal = $obat->stok;
+        $obat->stok -= $request->jumlah;
+        $obat->save();
+
+        LogObat::create([
+            'obat_id'       => $obat->id,
+            'jenis_mutasi'  => 'keluar',
+            'jumlah'        => $request->jumlah,
+            'stok_awal'     => $stokAwal,
+            'sisa_stok'     => $obat->stok,
+            'tgl_transaksi' => now(),
+            'keterangan'    => 'Pemberian obat ke pasien oleh paramedis',
+            'ref_type'      => 'resep',
+            'ref_id'        => $resep->id,
+        ]);
 
         optional($rekamMedis->kunjungan)->update(['status' => 'selesai']);
 
@@ -176,7 +192,7 @@ class ResepObatController extends Controller
             'stok_awal'    => $stokAwal,       // Nilai sebelum dikurangi
             'sisa_stok'    => $obat->stok,     // Nilai setelah dikurangi
             'tgl_transaksi' => now(),
-            'expired_at'   => $obat->expired_at,
+            // 'expired_at'   => $obat->expired_at,
             'keterangan'   => 'Obat diberikan ke pasien (melalui aksi Berikan)',
             'ref_type'     => 'resep',
             'ref_id'       => $resep->id,

@@ -24,22 +24,27 @@
             @csrf
 
             <div class="mb-4">
-                <label for="nama_obat" class="block font-medium">Nama Obat</label>
-                <input type="text" name="nama_obat" id="nama_obat" class="form-input w-full"
-                    value="{{ old('nama_obat') }}" required>
+                <label for="id_obat" class="block text-sm font-medium text-gray-700">Pilih Nama Obat</label>
+                <select name="id_obat" id="id_obat" class="form-select mt-1 block w-full rounded">
+                    <option value="">-- Pilih Obat --</option>
+                    @foreach ($obats as $obat)
+                        <option value="{{ $obat->id }}">{{ $obat->nama_obat }}</option>
+                    @endforeach
+                </select>
             </div>
 
             <div class="mb-4">
                 <label for="jenis_obat" class="block font-medium">Jenis Obat</label>
                 <select name="jenis_obat" id="jenis_obat" class="form-select w-full" required>
                     <option value="">-- Pilih Jenis Obat --</option>
-                    @foreach (['Tablet', 'Kapsul', 'Sirup', 'Salep', 'Injeksi', 'Tetes', 'Serbuk', 'Suppositoria', 'Spray'] as $jenis)
+                    @foreach ($jenis_obats as $jenis)
                         <option value="{{ $jenis }}" {{ old('jenis_obat') == $jenis ? 'selected' : '' }}>
                             {{ $jenis }}
                         </option>
                     @endforeach
                 </select>
             </div>
+
 
             <div class="mb-4">
                 <label for="stok" class="block font-medium">Stok</label>

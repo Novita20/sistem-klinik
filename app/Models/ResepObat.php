@@ -49,7 +49,6 @@ class ResepObat extends Model
 
     public function logObat()
     {
-        return $this->hasOne(\App\Models\LogObat::class, 'ref_id', 'id')
-            ->where('ref_type', 'resep');
+        return $this->hasOne(LogObat::class, 'ref_id')->where('ref_type', 'resep');
     }
 }

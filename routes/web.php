@@ -157,17 +157,25 @@ Route::middleware('auth')->group(function () {
     Route::delete('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'destroy'])->name('paramedis.rekammedis.destroy');
 
     //INPUT OBAT
+
     Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
     Route::get('/obat/create', [ObatController::class, 'create'])->name('obat.create');
     Route::get('/obat/{id}/edit', [ObatController::class, 'edit'])->name('obat.edit');
     Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
 
+    //tambah obat baru
+    Route::get('/obat/input', [ObatController::class, 'create'])->name('obat.input'); // untuk tambah stok
+    Route::get('/obat/baru', [ObatController::class, 'formObatBaru'])->name('obat.baru'); // untuk obat baru
+    Route::post('/obat/baru', [ObatController::class, 'storeObatBaru'])->name('obat.storeBaru');
+
+
     //MUTASI OBAT
-    Route::get('/mutasi-obat', [ObatController::class, 'mutasi'])->name('obat.mutasi');
-    Route::get('/paramedis/mutasi/edit/{id}', [ObatController::class, 'editLog'])->name('logobat.edit');
-    Route::put('/paramedis/mutasi/update/{id}', [ObatController::class, 'updateLog'])->name('logobat.update');
-
-
+    // Menu mutasi
+    Route::get('/obat/mutasi', [LogObatController::class, 'mutasi'])->name('logobat.mutasi');
+    // Route::get('/obat/mutasi/create', [LogObatController::class, 'createLog'])->name('logobat.create');
+    Route::post('/obat/mutasi', [LogObatController::class, 'storeLog'])->name('logobat.store');
+    Route::get('/obat/mutasi/{id}/edit', [LogObatController::class, 'editLog'])->name('logobat.edit');
+    Route::put('/obat/mutasi/{id}', [LogObatController::class, 'updateLog'])->name('logobat.update');
 
     // Route update: simpan perubahan data obat
     Route::put('/obat/{id}', [ObatController::class, 'update'])->name('obat.update');
@@ -176,6 +184,10 @@ Route::middleware('auth')->group(function () {
 
     //REKAP OBAT (PARAMEDIS)
     Route::get('/paramedis/rekap-obat', [RekapObatController::class, 'index'])->name('obat.rekap');
+    Route::get('/obat/rekap/export', [RekapObatController::class, 'exportExcel'])->name('obat.rekap.export');
+
+
+
 
     // 📦 PENGAJUAN (PARAMEDIS)
     Route::get('/paramedis/restock', [RestockObatController::class, 'index'])->name('paramedis.restock.index');

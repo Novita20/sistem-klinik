@@ -8,52 +8,75 @@
 
 @section('content')
     <div class="p-6">
+        {{-- Tombol Export Excel --}}
+        <div class="mb-4">
+            <form method="GET" action="{{ route('obat.rekap.export') }}">
+                <input type="hidden" name="start_date" value="{{ request('start_date') }}">
+                <input type="hidden" name="end_date" value="{{ request('end_date') }}">
+                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Export Excel
+                </button>
+            </form>
+        </div>
+        {{-- Tabel Rekap Obat --}}
         <div class="bg-white p-6 rounded-xl shadow w-full overflow-auto">
-            <table class="table-auto w-full border">
-                <thead>
-                    <tr class="bg-gray-100">
+
+            {{-- Filter Rentang Tanggal --}}
+            <div class="mb-4">
+                <form method="GET" action="{{ route('obat.rekap') }}" class="flex flex-wrap items-end gap-4">
+                    <div>
+                        <label for="start_date" class="block text-sm font-medium text-gray-700">Dari Tanggal:</label>
+                        <input type="date" name="start_date" id="start_date" value="{{ request('start_date') }}"
+                            class="form-input rounded px-3 py-1 border w-44" />
+                    </div>
+                    <div>
+                        <label for="end_date" class="block text-sm font-medium text-gray-700">Sampai Tanggal:</label>
+                        <input type="date" name="end_date" id="end_date" value="{{ request('end_date') }}"
+                            class="form-input rounded px-3 py-1 border w-44" />
+                    </div>
+
+
+                    <div>
+                        <button type="submit"
+                            class="mt-5 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Terapkan</button>
+                    </div>
+                </form>
+            </div>
+
+            <table class="table-auto w-full border text-sm">
+                <thead class="bg-gray-100">
+                    <tr>
                         <th class="p-2">No</th>
                         <th class="p-2">Nama Obat</th>
-                        <th class="p-2">Jenis</th>
-                        <th class="p-2">Satuan</th>
-                        <th class="p-2">Stok Saat Ini</th>
-                        <th class="p-2">Masuk</th>
-                        <th class="p-2">Keluar</th>
+                        <th class="p-2">Total Masuk</th>
+                        <th class="p-2">Total Keluar</th>
+                        <th class="p-2">Sisa Stok</th>
                         <th class="p-2">Frekuensi Digunakan</th>
-                        <th class="p-2">Rata-rata/Bulan</th>
-                        <th class="p-2">Tanggal Transaksi</th>
-                        <th class="p-2">Tanggal Expired</th>
+                        <th class="p-2">Terakhir Digunakan</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($data as $index => $obat)
+                    @forelse ($data as $index => $obat)
                         <tr class="border-t">
                             <td class="px-4 py-2 border">{{ $index + 1 }}</td>
                             <td class="px-4 py-2 border">{{ $obat['nama_obat'] }}</td>
-                            <td class="px-4 py-2 border">{{ $obat['jenis_obat'] }}</td>
-                            <td class="px-4 py-2 border">{{ $obat['satuan'] }}</td>
-                            <td class="px-4 py-2 border">{{ $obat['stok'] }}</td>
                             <td class="px-4 py-2 border">{{ $obat['total_masuk'] }}</td>
                             <td class="px-4 py-2 border">{{ $obat['total_keluar'] }}</td>
-                            <td class="px-4 py-2 border">{{ $obat['digunakan'] }} kali</td>
-                            <td class="px-4 py-2 border">{{ $obat['rata_rata_bulanan'] }}</td>
-
-                            {{-- Tanggal Transaksi --}}
+                            <td class="px-4 py-2 border">{{ $obat['stok'] }}</td>
+                            <td class="px-4 py-2 border">{{ $obat['frekuensi'] }} kali</td>
                             <td class="px-4 py-2 border">
                                 {{ $obat['terakhir_digunakan'] ? \Carbon\Carbon::parse($obat['terakhir_digunakan'])->format('d-m-Y') : '-' }}
                             </td>
-
-                            {{-- Tanggal Expired --}}
-                            <td class="px-4 py-2 border" style="color: {{ $obat['expired_color'] ?? 'inherit' }}">
-                                {{ $obat['expired_at'] ? \Carbon\Carbon::parse($obat['expired_at'])->format('d-m-Y') : '-' }}
-                            </td>
-
-
-
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="7" class="text-center py-4">Tidak ada data penggunaan obat pada rentang ini.
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
+
     </div>
 @endsection

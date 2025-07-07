@@ -33,6 +33,12 @@
             </div>
 
             <div class="mb-4">
+                <label for="stok_awal" class="block font-medium text-sm text-gray-700">Stok Awal</label>
+                <input type="number" name="stok_awal" id="stok_awal" value="{{ $log->stok_awal }}"
+                    class="form-input w-full rounded border-gray-300" required />
+            </div>
+
+            <div class="mb-4">
                 <label for="sisa_stok" class="block font-medium text-sm text-gray-700">Sisa Stok</label>
                 <input type="number" name="sisa_stok" id="sisa_stok" value="{{ $log->sisa_stok }}"
                     class="form-input w-full rounded border-gray-300" required />
@@ -46,9 +52,9 @@
             </div>
 
             <div class="mb-4">
-                <label for="tgl_exp" class="block font-medium text-sm text-gray-700">Tanggal Exp</label>
-                <input type="date" name="tgl_exp" id="tgl_exp"
-                    value="{{ $log->tgl_exp ? \Carbon\Carbon::parse($log->tgl_exp)->format('Y-m-d') : '' }}"
+                <label for="expired_at" class="block font-medium text-sm text-gray-700">Tanggal Expired</label>
+                <input type="date" name="expired_at" id="expired_at"
+                    value="{{ $log->expired_at ? \Carbon\Carbon::parse($log->expired_at)->format('Y-m-d') : '' }}"
                     class="form-input w-full rounded border-gray-300" />
             </div>
 
@@ -58,7 +64,7 @@
             </div>
 
             <div class="flex justify-end space-x-2">
-                <a href="{{ route('obat.mutasi') }}" class="btn btn-secondary">Kembali</a>
+                <a href="{{ route('logobat.mutasi') }}" class="btn btn-secondary">Kembali</a>
                 <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
                     Simpan Perubahan
                 </button>

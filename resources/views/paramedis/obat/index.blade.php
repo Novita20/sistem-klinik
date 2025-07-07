@@ -16,8 +16,11 @@
         @endif
 
         {{-- Header atas tabel: tombol + search --}}
-        <div class="mb-4 flex justify-between items-center">
-            <a href="{{ route('paramedis.resep.create') }}" class="btn btn-primary">+ Tambah Obat</a>
+        <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+            <div class="flex gap-2">
+                <a href="{{ route('obat.input') }}" class="btn btn-primary">+ Tambah Stok Obat</a>
+                <a href="{{ route('obat.baru') }}" class="btn btn-success">+ Obat Baru</a>
+            </div>
 
             <form action="{{ route('obat.index') }}" method="GET" class="flex items-center">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama obat..."
@@ -26,7 +29,6 @@
                 <a href="{{ route('obat.index') }}" class="btn btn-outline-secondary">Tampilkan Semua</a>
             </form>
         </div>
-
         {{-- Tabel Data Obat --}}
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white rounded-xl shadow-md">

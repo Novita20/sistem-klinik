@@ -85,7 +85,7 @@
 
                         $isStokObat = in_array($routeName, [
                             'obat.index',
-                            'obat.mutasi',
+                            'logobat.mutasi',
                             'obat.rekap',
                             'paramedis.restock.index',
                         ]);
@@ -160,8 +160,8 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('obat.mutasi') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'obat.mutasi' ? 'active' : '' }}">
+                                <a href="{{ route('logobat.mutasi') }}"
+                                    class="nav-link pl-4 {{ $routeName === 'logobat.mutasi' ? 'active' : '' }}">
                                     <i class="nav-icon fas fa-exchange-alt"></i>
                                     <p>Mutasi Obat</p>
                                 </a>
