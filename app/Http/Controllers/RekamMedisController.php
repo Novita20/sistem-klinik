@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Kunjungan;
-
-
+use App\Models\Pasien;
 use App\Models\RekamMedis;
 
 class RekamMedisController extends Controller
@@ -20,7 +19,7 @@ class RekamMedisController extends Controller
         $user = Auth::user();
 
         // Cari ID pasien dari user_id yang sedang login
-        $pasienId = \App\Models\Pasien::where('user_id', $user->id)->value('id');
+        $pasienId = Pasien::where('user_id', $user->id)->value('id');
 
         $rekammedis = RekamMedis::with([
             'kunjungan.pasien.user',

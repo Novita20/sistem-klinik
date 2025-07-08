@@ -13,13 +13,18 @@
     <div class="sidebar">
         <!-- Sidebar user (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-            <div class="image">
-                {{-- Optional user image here --}}
-            </div>
+            {{-- <div class="image mb-2">
+                <img src="{{ asset('assets/dist/img/plnnp.png') }}" alt="Logo PLN" style="width: 40px; height: auto;">
+            </div> --}}
+
             <div class="info">
-                <a href="#" class="d-block"
-                    style="color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Klinik</a>
+                <a href="{{ Auth::user()->role === 'pasien' ? url('/dashboard') : url(Auth::user()->role . '/dashboard') }}"
+                    class="d-block" style="color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                    Klinik
+                </a>
             </div>
+
+
         </div>
 
         <!-- Sidebar Menu -->
@@ -299,6 +304,8 @@
                 @endif
 
 
+
+
                 {{-- 🔷 SIDEBAR UNTUK ROLE K3 --}}
                 @if (Auth::check() && Auth::user()->role === 'k3')
                     {{-- 📋 Pengajuan Restock Obat --}}
@@ -338,6 +345,49 @@
                         </ul>
                     </li>
                 @endif
+
+
+
+                {{-- 🔷 SIDEBAR UNTUK ROLE SDM --}}
+                @if (Auth::check() && Auth::user()->role === 'sdm')
+                    <li class="nav-item">
+                        <a href="{{ route('sdm.rekammedis.index') }}"
+                            class="nav-link {{ request()->routeIs('sdm.rekammedis.index') ? 'active' : '' }}">
+                            <i class="fas fa-notes-medical nav-icon"></i>
+                            <p>Rekam Medis Pasien</p>
+                        </a>
+                    </li>
+
+                    {{-- 💊 Laporan Penggunaan Obat --}}
+                    <li class="nav-item">
+                        <a href="{{ route('laporan_obat') }}"
+                            class="nav-link {{ request()->routeIs('laporan_obat') ? 'active' : '' }}">
+                            <i class="fas fa-file-medical nav-icon"></i>
+                            <p>Laporan Penggunaan Obat</p>
+                        </a>
+                    </li>
+
+                    {{-- 👤 Profil --}}
+                    <li class="nav-item has-treeview {{ request()->routeIs('profile.edit') ? 'menu-open' : '' }}">
+                        <a href="#" class="nav-link {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+                            <p>
+                                Profil
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('profile.edit') }}"
+                                    class="nav-link pl-4 {{ request()->routeIs('profile.edit') ? 'active' : '' }}">
+                                    <i class="fas fa-user nav-icon"></i>
+                                    <p>Edit Profil</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                @endif
+
+
 
 
                 {{-- Tambahkan kondisi untuk role lain seperti dokter, paramedis, dll di bawah ini --}}

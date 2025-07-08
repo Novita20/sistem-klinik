@@ -23,6 +23,8 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RekapObatController;
 use App\Http\Controllers\ResepObatController;
 use App\Http\Controllers\RestockObatController;
+use App\Http\Controllers\SdmLaporanObatController;
+use App\Http\Controllers\SdmRekamMedisController;
 
 // ========================
 // 🏠 HALAMAN AWAL
@@ -47,7 +49,7 @@ Route::middleware('guest')->group(function () {
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 
     Route::get('reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+    Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.change');
 });
 
 
@@ -89,10 +91,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/kunjungan/store', [KunjunganController::class, 'store'])->name('kunjungan.store');
     Route::get('/kunjungan/riwayat', [KunjunganController::class, 'riwayat'])->name('kunjungan.riwayat');
 
-    // ========================
-    // 🩺 REKAM MEDIS (PASIEN)
-    // ========================
-    Route::get('/rekam-medis', [RekamMedisController::class, 'index'])->name('rekam.medis');
+    Route::get('rekam-medis', [RekamMedisController::class, 'index'])->name('rekam.medis');
+
+
     // routes/web.php
     // Route::get('/rekam-medis/{id}/download', [RekamMedisController::class, 'download'])->name('rekam.medis.download');
 
@@ -100,9 +101,9 @@ Route::middleware('auth')->group(function () {
     // ========================
     // 💊 RESEP OBAT
     // ========================
-    // Untuk paramedis - input resep
-    // 💊 RESEP OBAT untuk PASIEN (melihat resep miliknya sendiri)
+
     Route::get('/resep/pasien', [ResepObatController::class, 'indexResep'])->name('pasien.resep.index');
+
 
     // ========================
     // 👤 PROFIL USER
@@ -243,23 +244,45 @@ Route::middleware('auth')->group(function () {
 
     //K3
 
-    // ✅ K3 - Lihat pengajuan restock yang menunggu persetujuan
+
+    // K3 - Restock Obat
     Route::get('/k3/restock', [K3RestockController::class, 'index'])->name('k3.restock');
-
-    // ✅ K3 - Setujui pengajuan restock
     Route::post('/k3/restock/{id}/setujui', [K3RestockController::class, 'setujui'])->name('k3.restock.setujui');
-
-    // ✅ K3 - Tolak pengajuan restock
     Route::post('/k3/restock/{id}/tolak', [K3RestockController::class, 'tolak'])->name('k3.restock.tolak');
+    Route::get('/k3/laporan-obat', [K3RestockController::class, 'laporan'])->name('k3.restock.laporan');
+    Route::get('/k3/restock/{id}/edit', [K3RestockController::class, 'edit'])->name('k3.restock.edit');
+    Route::put('/k3/restock/{id}/update', [K3RestockController::class, 'update'])->name('k3.restock.update');
+    Route::delete('/k3/restock/{id}/delete', [K3RestockController::class, 'destroy'])->name('k3.restock.destroy');
 
 
     // 📋 LAPORAN PENGGUNAAN OBAT (K3)
     Route::get('/k3/obat', [K3RestockController::class, 'laporan'])->name('k3.obat');
+    Route::get('/k3/laporan-obat/export', [K3RestockController::class, 'export'])->name('k3.restock.export');
 });
 
 Route::get('/debug-mail', function () {
     return config('mail.mailers.smtp');
 });
+
+
+
+
+
+//SDM
+
+Route::get('/sdm/rekam-medis', [SdmRekamMedisController::class, 'index'])->name('sdm.rekammedis.index');
+Route::get('/sdm/rekam-medis/export', [SdmRekamMedisController::class, 'export'])->name('rekam_medis.export');
+
+
+// Tampilkan laporan penggunaan obat
+Route::get('/sdm/laporan-obat', [SdmLaporanObatController::class, 'index'])->name('laporan_obat');
+
+// Export laporan penggunaan obat ke Excel
+Route::get('/sdm/laporan-obat/export', [SdmLaporanObatController::class, 'export'])->name('laporan_obat.export');
+
+
+
+
 
 
 

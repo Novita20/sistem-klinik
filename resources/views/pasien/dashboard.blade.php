@@ -56,7 +56,7 @@
             <div class="card-header bg-secondary text-white">Rekam Medis (View Only)</div>
             <div class="card-body">
                 <p>Hanya melihat data rekam medis dari dokter sebagai referensi pemberian obat.</p>
-                <a href="{{ route('rekam.medis') }}" class="btn btn-secondary">Lihat Rekam Medis</a>
+                {{-- <a href="{{ route('rekam.medis') }}" class="btn btn-secondary">Lihat Rekam Medis</a> --}}
             </div>
         </div>
 

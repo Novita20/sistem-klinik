@@ -1,43 +1,48 @@
 @extends('layouts.main')
 
+@section('content-header')
+    <div class="p-4">
+        <h1 class="text-2xl font-bold text-gray-800 text-center">📋 Riwayat Kunjungan Anda</h1>
+    </div>
+@endsection
+
 @section('content')
-    <div class="container mt-4">
-        <h3 class="mb-4">📋 Riwayat Kunjungan Anda</h3>
+    <div class="p-6">
+        <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">
 
-        {{-- Flash message --}}
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @elseif (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+            {{-- Flash message --}}
+            @if (session('success'))
+                <div class="alert alert-success mb-4">{{ session('success') }}</div>
+            @elseif (session('error'))
+                <div class="alert alert-danger mb-4">{{ session('error') }}</div>
+            @endif
 
-        {{-- Data riwayat --}}
-        @if ($riwayat->isEmpty())
-            <div class="alert alert-info">Belum ada riwayat kunjungan.</div>
-        @else
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead class="table-primary">
+            {{-- Data riwayat --}}
+            @if ($riwayat->isEmpty())
+                <div class="text-center text-gray-600">Belum ada riwayat kunjungan.</div>
+            @else
+                <table class="min-w-[900px] w-full border border-gray-300 text-sm text-left">
+                    <thead class="bg-gray-100 text-gray-700 text-center">
                         <tr>
-                            <th>No</th>
-                            <th>Tanggal</th>
-                            <th>Keluhan</th>
-                            <th>Dokter</th>
-                            <th>Status</th>
+                            <th class="border px-3 py-2">No</th>
+                            <th class="border px-3 py-2">Tanggal</th>
+                            <th class="border px-3 py-2">Keluhan</th>
+                            <th class="border px-3 py-2">Dokter</th>
+                            <th class="border px-3 py-2">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($riwayat as $kunjungan)
-                            <tr>
-                                <td class="px-4 py-2 border">{{ $loop->iteration }}</td>
-                                <td>
+                            <tr class="hover:bg-gray-50">
+                                <td class="border px-3 py-2 text-center">{{ $loop->iteration }}</td>
+                                <td class="border px-3 py-2">
                                     {{ \Carbon\Carbon::parse($kunjungan->tgl_kunjungan ?? now())->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
                                 </td>
-                                <td>{{ $kunjungan->keluhan ?? '-' }}</td>
-                                <td>
+                                <td class="border px-3 py-2">{{ $kunjungan->keluhan ?? '-' }}</td>
+                                <td class="border px-3 py-2 text-center">
                                     {{ $kunjungan->rekamMedis && $kunjungan->rekamMedis->dokter ? $kunjungan->rekamMedis->dokter->name : '-' }}
                                 </td>
-                                <td>
+                                <td class="border px-3 py-2 text-center">
                                     @php
                                         $status = $kunjungan->status ?? 'belum_ditangani';
                                     @endphp
@@ -75,7 +80,7 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
-        @endif
+            @endif
+        </div>
     </div>
 @endsection
