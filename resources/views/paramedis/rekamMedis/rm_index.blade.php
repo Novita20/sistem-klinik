@@ -8,8 +8,9 @@
 
 @section('content')
     <div class="p-6">
-        <div class="mb-4">
-            <form method="GET" action="{{ route('paramedis.rekammedis.index') }}" class="flex flex-wrap gap-2 items-center">
+        <div class="mb-4 flex flex-wrap md:flex-nowrap justify-between items-center gap-2">
+            {{-- 🔍 Form Pencarian --}}
+            <form method="GET" action="{{ route('paramedis.rekammedis.index') }}" class="flex gap-2 items-center">
                 <input type="text" name="search" placeholder="Cari nama pasien..." value="{{ request('search') }}"
                     class="border border-gray-300 rounded-lg px-4 py-2 w-64">
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
@@ -20,6 +21,12 @@
                         class="text-sm text-red-500 ml-2 hover:underline">Reset</a>
                 @endif
             </form>
+
+            {{-- 📥 Tombol Export Excel --}}
+            <a href="{{ route('paramedis.rekammedis.export', request()->query()) }}"
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 whitespace-nowrap">
+                📥 Export Excel
+            </a>
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow-md overflow-x-auto">

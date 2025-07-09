@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RekamMedis;
 use App\Models\Kunjungan;
+use App\Exports\ParamedisRekamMedisExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ParamedisRekamMedisController extends Controller
 {
@@ -22,6 +24,11 @@ class ParamedisRekamMedisController extends Controller
 
         $rekammedis = $query->latest()->paginate(10);
         return view('paramedis.rekammedis.rm_index', compact('rekammedis'));
+    }
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+        return Excel::download(new ParamedisRekamMedisExport($search), 'rekam_medis.xlsx');
     }
 
     public function create($kunjunganId)

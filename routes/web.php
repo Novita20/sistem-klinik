@@ -124,6 +124,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/paramedis/kunjungan/hasil', [HasilKunjunganController::class, 'hasil'])->name('paramedis.kunjungan.hasil');
     Route::get('/paramedis/kunjungan/{id}', [HasilKunjunganController::class, 'show'])->name('paramedis.kunjungan.show');
     Route::get('/paramedis/riwayat-kunjungan', [HasilKunjunganController::class, 'riwayat'])->name('paramedis.kunjungan.riwayat');
+    Route::get('/paramedis/riwayat-kunjungan/export', [HasilKunjunganController::class, 'export'])->name('paramedis.kunjungan.export');
+
     // Route::get('/paramedis/rekam-medis/create', [HasilKunjunganController::class, 'create'])->name('paramedis.rekammedis.create');
     // Route::post('/paramedis/rekam-medis/store', [HasilKunjunganController::class, 'store'])->name('paramedis.rekammedis.store');
 
@@ -151,6 +153,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/rekammedis', [ParamedisRekamMedisController::class, 'index'])->name('paramedis.rekammedis.index');
     Route::get('/rekammedis/create/{kunjunganId}', [ParamedisRekamMedisController::class, 'create'])->name('paramedis.rekammedis.create');
     Route::post('/rekammedis/store', [ParamedisRekamMedisController::class, 'store'])->name('paramedis.rekammedis.store');
+    Route::get('/paramedis/rekam-medis/export', [ParamedisRekamMedisController::class, 'export'])->name('paramedis.rekammedis.export');
+
 
     // ✅ Tambahan route edit, update, destroy
     Route::get('/rekammedis/{id}/edit', [ParamedisRekamMedisController::class, 'edit'])->name('paramedis.rekammedis.edit');

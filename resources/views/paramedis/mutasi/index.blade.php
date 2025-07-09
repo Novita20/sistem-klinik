@@ -15,14 +15,20 @@
             </div>
         @endif
 
-        {{-- 🔍 Search --}}
-
-        <form action="{{ route('logobat.mutasi') }}" method="GET" class="flex items-center">
-            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama obat..."
-                class="form-input mr-2">
-            <button type="submit" class="btn btn-secondary mr-2">Cari</button>
-            <a href="{{ route('logobat.mutasi') }}" class="btn btn-outline-secondary">Tampilkan Semua</a>
-        </form>
+        <div class="mb-4 flex flex-wrap md:flex-nowrap justify-between items-center gap-4">
+            {{-- 🔍 Form Pencarian --}}
+            <form method="GET" action="{{ route('logobat.mutasi') }}" class="flex gap-2 items-center">
+                <input type="text" name="search" placeholder="Cari nama obat..." value="{{ request('search') }}"
+                    class="border border-gray-300 rounded-lg px-4 py-2 w-64" />
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Cari
+                </button>
+                @if (request('search'))
+                    <a href="{{ route('logobat.mutasi') }}"
+                        class="text-sm text-red-500 ml-2 hover:underline whitespace-nowrap">Reset</a>
+                @endif
+            </form>
+        </div>
 
         {{-- 📊 Tabel Mutasi --}}
         <div class="bg-white p-4 rounded-xl shadow-md overflow-auto">

@@ -16,19 +16,30 @@
         @endif
 
         {{-- Header atas tabel: tombol + search --}}
-        <div class="mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+        <div class="mb-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            {{-- Tombol Tambah --}}
             <div class="flex gap-2">
-                <a href="{{ route('obat.input') }}" class="btn btn-primary">+ Tambah Stok Obat</a>
-                <a href="{{ route('obat.baru') }}" class="btn btn-success">+ Obat Baru</a>
+                <a href="{{ route('obat.input') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                    + Tambah Stok Obat
+                </a>
+                <a href="{{ route('obat.baru') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                    + Obat Baru
+                </a>
             </div>
 
-            <form action="{{ route('obat.index') }}" method="GET" class="flex items-center">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama obat..."
-                    class="form-input mr-2">
-                <button type="submit" class="btn btn-secondary mr-2">Cari</button>
-                <a href="{{ route('obat.index') }}" class="btn btn-outline-secondary">Tampilkan Semua</a>
+            {{-- 🔍 Form Pencarian --}}
+            <form method="GET" action="{{ route('obat.index') }}" class="flex gap-2 items-center">
+                <input type="text" name="search" placeholder="Cari nama obat..." value="{{ request('search') }}"
+                    class="border border-gray-300 rounded-lg px-4 py-2 w-64" />
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Cari
+                </button>
+                @if (request('search'))
+                    <a href="{{ route('obat.index') }}" class="text-sm text-red-500 ml-2 hover:underline">Reset</a>
+                @endif
             </form>
         </div>
+
         {{-- Tabel Data Obat --}}
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white rounded-xl shadow-md">

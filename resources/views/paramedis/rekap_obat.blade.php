@@ -9,15 +9,17 @@
 @section('content')
     <div class="p-6">
         {{-- Tombol Export Excel --}}
-        <div class="mb-4">
+        <div class="mb-4 flex justify-end">
             <form method="GET" action="{{ route('obat.rekap.export') }}">
                 <input type="hidden" name="start_date" value="{{ request('start_date') }}">
                 <input type="hidden" name="end_date" value="{{ request('end_date') }}">
-                <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-                    Export Excel
+                <button type="submit"
+                    class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 whitespace-nowrap">
+                    📥 Export Excel
                 </button>
             </form>
         </div>
+
         {{-- Tabel Rekap Obat --}}
         <div class="bg-white p-6 rounded-xl shadow w-full overflow-auto">
 

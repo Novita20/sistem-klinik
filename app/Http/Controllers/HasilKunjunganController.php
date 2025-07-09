@@ -7,6 +7,8 @@ use App\Models\RekamMedis;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\ParamedisRiwayatKunjunganExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HasilKunjunganController extends Controller
 {
@@ -48,14 +50,28 @@ class HasilKunjunganController extends Controller
     /**
      * Menampilkan riwayat kunjungan paramedis
      */
-    public function riwayat()
+    public function riwayat(Request $request)
     {
-        $riwayatKunjungan = Kunjungan::with('pasien.user')
-            ->orderByDesc('tgl_kunjungan')
-            ->get();
+        $keyword = $request->input('search');
 
-        return view('paramedis.riwayat_kunjungan', compact('riwayatKunjungan'));
+        $riwayatKunjungan = Kunjungan::with('pasien.user')
+            ->when($keyword, function ($query, $keyword) {
+                $query->whereHas('pasien.user', function ($q) use ($keyword) {
+                    $q->where('name', 'like', '%' . $keyword . '%');
+                });
+            })
+            ->orderByDesc('tgl_kunjungan')
+            ->paginate(10); // Tampilkan 10 data per halaman
+
+        return view('paramedis.riwayat_kunjungan', compact('riwayatKunjungan', 'keyword'));
     }
+
+    public function export(Request $request)
+    {
+        $search = $request->input('search');
+        return Excel::download(new ParamedisRiwayatKunjunganExport($search), 'riwayat_kunjungan.xlsx');
+    }
+
 
 
     /**
