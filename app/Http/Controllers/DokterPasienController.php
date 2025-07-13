@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Kunjungan;
 use App\Models\RekamMedis;
+use Barryvdh\DomPDF\Facade\Pdf;
+
 
 class DokterPasienController extends Controller
 {
@@ -58,6 +60,15 @@ class DokterPasienController extends Controller
         session(['kunjungan_id' => $kunjungan->id]);
 
         return view('dokter.diagnosis', compact('kunjungan'));
+    }
+
+
+    public function exportPdf($id)
+    {
+        $kunjungan = Kunjungan::with(['pasien.user', 'rekamMedis.resepObat.obat'])->findOrFail($id);
+
+        $pdf = PDF::loadView('dokter.pdf.detail_kunj', compact('kunjungan'));
+        return $pdf->download('kunjungan-pasien-' . $kunjungan->id . '.pdf');
     }
 
     /**

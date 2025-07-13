@@ -24,12 +24,12 @@
                 <table class="min-w-full table-auto text-sm border">
                     <thead class="bg-gray-100 text-left">
                         <tr>
-                            <th class="px-4 py-2 border">No</th>
-                            <th class="px-4 py-2 border">Nama Pasien</th>
-                            <th class="px-4 py-2 border">Tanggal Kunjungan</th>
-                            <th class="px-4 py-2 border">Keluhan</th>
-                            <th class="px-4 py-2 border">Status</th>
-                            <th class="px-4 py-2 border">Aksi</th>
+                            <th class="px-4 py-2 border text-center">No</th>
+                            <th class="px-4 py-2 border text-center">Nama Pasien</th>
+                            <th class="px-4 py-2 border text-center">Tanggal Kunjungan</th>
+                            <th class="px-4 py-2 border text-center">Keluhan</th>
+                            <th class="px-4 py-2 border text-center">Status</th>
+                            <th class="px-4 py-2 border text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -62,13 +62,13 @@
                                     {{-- 🔍 Detail --}}
                                     <a href="{{ route('dokter.kunjungan.show', $k->id) }}"
                                         class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-xs">
-                                        Detail
+                                        🔍 Detail
                                     </a>
 
                                     {{-- ✏️ Edit --}}
                                     <a href="{{ route('dokter.kunjungan.edit', $k->id) }}"
                                         class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded text-xs">
-                                        Edit
+                                        ✏️ Edit
                                     </a>
 
                                     {{-- 🗑️ Delete --}}
@@ -78,7 +78,7 @@
                                         @method('DELETE')
                                         <button type="submit"
                                             class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs">
-                                            Delete
+                                            🗑️ Delete
                                         </button>
                                     </form>
                                 </td>

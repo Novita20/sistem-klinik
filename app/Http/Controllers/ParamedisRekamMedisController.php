@@ -7,6 +7,7 @@ use App\Models\RekamMedis;
 use App\Models\Kunjungan;
 use App\Exports\ParamedisRekamMedisExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ParamedisRekamMedisController extends Controller
 {
@@ -35,6 +36,12 @@ class ParamedisRekamMedisController extends Controller
     {
         $kunjungan = Kunjungan::with('pasien.user')->findOrFail($kunjunganId);
         return view('paramedis.rekammedis.rm_create', compact('kunjungan'));
+    }
+
+    public function show($id)
+    {
+        $rm = RekamMedis::with(['kunjungan.pasien.user', 'resepObat.obat'])->findOrFail($id);
+        return view('paramedis.rekammedis.rm_detail', compact('rm'));
     }
 
     public function store(Request $request)
@@ -84,5 +91,12 @@ class ParamedisRekamMedisController extends Controller
         $rekammedis->delete();
 
         return redirect()->route('paramedis.rekammedis.index')->with('success', 'Rekam medis berhasil dihapus.');
+    }
+
+    public function downloadPDF($id)
+    {
+        $rm = RekamMedis::with(['kunjungan.pasien.user', 'resepObat.obat'])->findOrFail($id);
+        $pdf = Pdf::loadView('paramedis.rekamMedis.rm_pdf', compact('rm'));
+        return $pdf->download('rekam_medis_' . $rm->id . '.pdf');
     }
 }

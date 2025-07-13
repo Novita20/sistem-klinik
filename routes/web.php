@@ -154,12 +154,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/rekammedis/create/{kunjunganId}', [ParamedisRekamMedisController::class, 'create'])->name('paramedis.rekammedis.create');
     Route::post('/rekammedis/store', [ParamedisRekamMedisController::class, 'store'])->name('paramedis.rekammedis.store');
     Route::get('/paramedis/rekam-medis/export', [ParamedisRekamMedisController::class, 'export'])->name('paramedis.rekammedis.export');
+    Route::get('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'show'])->name('paramedis.rekammedis.show');
+
 
 
     // ✅ Tambahan route edit, update, destroy
     Route::get('/rekammedis/{id}/edit', [ParamedisRekamMedisController::class, 'edit'])->name('paramedis.rekammedis.edit');
     Route::put('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'update'])->name('paramedis.rekammedis.update');
     Route::delete('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'destroy'])->name('paramedis.rekammedis.destroy');
+    Route::get('/rekammedis/{id}/pdf', [ParamedisRekamMedisController::class, 'downloadPDF'])->name('paramedis.rekammedis.pdf');
 
     //INPUT OBAT
 
@@ -220,6 +223,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dokter/kunjungan/{id}/edit', [DokterPasienController::class, 'edit'])->name('dokter.kunjungan.edit');
     Route::put('/dokter/kunjungan/{id}', [DokterPasienController::class, 'update'])->name('dokter.kunjungan.update');
     Route::delete('/dokter/kunjungan/{id}', [DokterPasienController::class, 'destroy'])->name('dokter.kunjungan.destroy');
+    Route::get('/dokter/kunjungan/{id}/pdf', [DokterPasienController::class, 'exportPdf'])->name('dokter.kunjungan.pdf');
 
 
 
