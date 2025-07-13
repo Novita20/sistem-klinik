@@ -18,9 +18,9 @@
 
         <div class="card">
             <div class="card-body table-responsive">
-                <table class="table table-bordered">
+                <table class="table table-bordered text-sm">
                     <thead class="table-light">
-                        <tr>
+                        <tr class="text-center">
                             <th>No</th>
                             <th>Nama Obat</th>
                             <th>Jumlah</th>
@@ -31,30 +31,25 @@
                     <tbody>
                         @forelse ($pengajuan as $key => $item)
                             <tr>
-                                <td>{{ $key + 1 }}</td>
-                                <td>{{ $item->obat->nama_obat }}</td>
-                                <td>{{ $item->jumlah }}</td>
-                                <td>
+                                <td class="text-center">{{ $key + 1 }}</td>
+                                <td>{{ $item->obat->nama_obat ?? '-' }}</td>
+                                <td class="text-center">{{ $item->jumlah }}</td>
+                                <td class="text-center">
                                     @if ($item->status == 'diajukan')
-                                        <span class="badge bg-warning">Menunggu</span>
+                                        <span class="badge bg-warning text-dark">Menunggu</span>
                                     @elseif ($item->status == 'disetujui')
                                         <span class="badge bg-success">Disetujui</span>
                                     @else
                                         <span class="badge bg-danger">Ditolak</span>
                                     @endif
                                 </td>
-
-                                <td>
+                                <td class="text-center">
                                     {{ \Carbon\Carbon::parse($item->tanggal_pengajuan)->timezone('Asia/Jakarta')->format('d M Y H:i') }}
                                 </td>
-
-
-
-
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">Belum ada pengajuan.</td>
+                                <td colspan="5" class="text-center">Belum ada pengajuan.</td>
                             </tr>
                         @endforelse
                     </tbody>

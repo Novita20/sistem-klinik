@@ -16,9 +16,8 @@ class RestockObatController extends Controller
     public function index()
     {
         $pengajuan = RestockObat::with('obat')
-            ->orderBy('created_at', 'desc')
+            ->orderBy('tanggal_pengajuan', 'desc')
             ->get();
-
         return view('paramedis.restock.index', compact('pengajuan'));
     }
 
@@ -38,19 +37,24 @@ class RestockObatController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'obat_id' => 'required|exists:obat,id',
-            'jumlah' => 'required|integer|min:1',
+            'obat_id' => 'required|array',
+            'obat_id.*' => 'exists:obat,id',
+            'jumlah' => 'required|array',
+            'jumlah.*' => 'integer|min:1',
             'tanggal_pengajuan' => 'required|date',
         ]);
 
-        RestockObat::create([
-            'obat_id' => $request->obat_id,
-            'jumlah' => $request->jumlah,
-            'status' => 'diajukan',
-            'tanggal_pengajuan' => Carbon::createFromFormat('Y-m-d\TH:i', $request->tanggal_pengajuan, 'Asia/Jakarta')->setTimezone('UTC'),
+        // Simpan semua pengajuan
+        foreach ($request->obat_id as $index => $obatId) {
+            RestockObat::create([
+                'obat_id' => $obatId,
+                'jumlah' => $request->jumlah[$index],
+                'status' => 'diajukan',
+                'tanggal_pengajuan' => $request->tanggal_pengajuan,
+            ]);
+        }
 
-        ]);
-
+        // PENTING: redirect HARUS DILUAR foreach
         return redirect()->route('paramedis.restock.index')
             ->with('success', 'Pengajuan berhasil dikirim ke K3.');
     }
