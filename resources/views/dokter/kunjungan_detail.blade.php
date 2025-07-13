@@ -16,7 +16,6 @@
     <div class="p-6">
         <div class="bg-white p-6 rounded-xl shadow space-y-6">
 
-
             {{-- 👤 Informasi Pasien --}}
             <div>
                 <h2 class="text-xl font-semibold mb-2">👤 Informasi Pasien</h2>
@@ -42,79 +41,94 @@
                 </p>
             </div>
 
-            {{-- 🩺 Form Anamnesa Dokter --}}
+            {{-- 🩺 Anamnesa Dokter --}}
             @if (!$kunjungan->rekamMedis)
                 <div>
                     <h2 class="text-xl font-semibold mb-2">🩺 Anamnesa Dokter</h2>
                     <form action="{{ route('dokter.rekammedis.store') }}" method="POST" class="space-y-4">
                         @csrf
                         <input type="hidden" name="kunjungan_id" value="{{ $kunjungan->id }}">
-
                         <div>
                             <label class="block font-medium">Anamnesa</label>
                             <textarea name="anamnesa" class="w-full border rounded px-3 py-2" required></textarea>
                         </div>
-
                         <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
                             Simpan Anamnesa
                         </button>
                     </form>
                 </div>
             @else
-                {{-- 📋 Anamnesa --}}
                 <div>
                     <h2 class="text-xl font-semibold mb-2">📋 Anamnesa</h2>
                     <p><strong>Isi Anamnesa:</strong> {{ $kunjungan->rekamMedis->anamnesa ?? '-' }}</p>
                 </div>
 
                 {{-- 🧾 Diagnosa & Tindakan --}}
-                @if ($kunjungan->status === 'tindakan_dokter')
+                @if (
+                    $kunjungan->status === 'tindakan_dokter' &&
+                        (empty($kunjungan->rekamMedis->diagnosis) || empty($kunjungan->rekamMedis->tindakan)))
                     <div>
                         <h2 class="text-xl font-semibold mt-6 mb-2">🧾 Diagnosa & Tindakan</h2>
                         <form action="{{ route('dokter.rekammedis.update', $kunjungan->rekamMedis->id) }}" method="POST">
                             @csrf
                             @method('PUT')
-
                             <div class="mb-4">
                                 <label class="block font-medium">Diagnosa</label>
-                                <textarea name="diagnosa" class="w-full border rounded px-3 py-2" required>{{ $kunjungan->rekamMedis->diagnosa }}</textarea>
+                                <textarea name="diagnosis" class="w-full border rounded px-3 py-2" required>{{ old('diagnosis', $kunjungan->rekamMedis->diagnosis) }}</textarea>
                             </div>
-
+                            <div class="mb-4">
+                                <label class="block font-medium">Tindakan</label>
+                                <textarea name="tindakan" class="w-full border rounded px-3 py-2" required>{{ old('tindakan', $kunjungan->rekamMedis->tindakan) }}</textarea>
+                            </div>
                             <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                                Simpan Diagnosa
+                                Simpan Diagnosa & Tindakan
                             </button>
                         </form>
                     </div>
+                @else
+                    <div>
+                        <h2 class="text-xl font-semibold mt-6 mb-2">🧾 Diagnosa & Tindakan</h2>
+                        <p><strong>Diagnosa:</strong> {{ $kunjungan->rekamMedis->diagnosis }}</p>
+                        <p><strong>Tindakan:</strong> {{ $kunjungan->rekamMedis->tindakan }}</p>
+                    </div>
+                @endif
 
-                    {{-- 💊 Tambah Resep Obat --}}
-                    @if ($kunjungan->rekamMedis)
-                        <div class="mt-4">
-                            <a href="{{ route('dokter.resep.create', $kunjungan->rekamMedis->id) }}"
-                                class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
-                                ➕ Tambah Resep Obat
-                            </a>
-                        </div>
-                    @else
-                        <div class="text-sm text-gray-600 italic mt-2">
-                            @switch($kunjungan->status)
-                                @case('belum_ditangani')
-                                    Menunggu hasil pemeriksaan paramedis (TTV, GDS, dll) sebelum dokter melanjutkan diagnosa dan
-                                    tindakan.
-                                @break
+                {{-- 💊 Resep Obat --}}
+                @php
+                    $reseps = optional($kunjungan->rekamMedis)->resepObat;
+                @endphp
 
-                                @case('selesai')
-                                    Kunjungan telah selesai. Semua data telah direkam.
-                                @break
-
-                                @case('tindakan_dokter')
-                                    Tindakan dokter telah dilakukan. Silakan periksa detail rekam medis.
-                                @break
-
-                                @default
-                                    Status kunjungan saat ini: {{ $kunjungan->status }}
-                            @endswitch
-                        </div>
-                    @endif
+                @if ($reseps && $reseps->count() > 0)
+                    <div class="mt-6">
+                        <h2 class="text-xl font-semibold mb-2">💊 Resep Obat</h2>
+                        <table class="w-full border text-sm">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="border px-2 py-1">Nama Obat</th>
+                                    <th class="border px-2 py-1">Jumlah</th>
+                                    <th class="border px-2 py-1">Dosis</th>
+                                    <th class="border px-2 py-1">Aturan Pakai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($reseps as $resep)
+                                    <tr>
+                                        <td class="border px-2 py-1">{{ $resep->obat->nama_obat ?? '-' }}</td>
+                                        <td class="border px-2 py-1">{{ $resep->jumlah }}</td>
+                                        <td class="border px-2 py-1">{{ $resep->dosis }}</td>
+                                        <td class="border px-2 py-1">{{ $resep->aturan_pakai }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="mt-4">
+                        <a href="{{ route('dokter.resep.create', $kunjungan->rekamMedis->id) }}"
+                            class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+                            ➕ Tambah Resep Obat
+                        </a>
+                    </div>
                 @endif
             @endif
 

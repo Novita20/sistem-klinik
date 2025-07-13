@@ -217,6 +217,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/dokter/kunjungan/show/{id}', [DokterPasienController::class, 'showKunjungan'])->name('dokter.kunjungan.show');
     Route::get('/dokter/kunjungan/detail/{id}', [DokterPasienController::class, 'detailKunjungan'])->name('dokter.kunjungan.detail');
     Route::post('/dokter/rekam-medis/store', [DokterRekamMedisController::class, 'store'])->name('dokter.rekammedis.store');
+    Route::get('/dokter/kunjungan/{id}/edit', [DokterPasienController::class, 'edit'])->name('dokter.kunjungan.edit');
+    Route::put('/dokter/kunjungan/{id}', [DokterPasienController::class, 'update'])->name('dokter.kunjungan.update');
+    Route::delete('/dokter/kunjungan/{id}', [DokterPasienController::class, 'destroy'])->name('dokter.kunjungan.destroy');
+
 
 
 
@@ -242,6 +246,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/resep/{id}/edit', [DokterResepController::class, 'edit'])->name('dokter.resep.edit');
     Route::delete('/resep/{id}', [DokterResepController::class, 'destroy'])->name('dokter.resep.destroy');
     Route::put('/dokter/resep/{id}', [DokterResepController::class, 'update'])->name('dokter.resep.update');
+
+    Route::get('/dokter/resep/form-item', [DokterResepController::class, 'formItem'])->name('dokter.resep.formItem');
+    Route::get('/obat/search', [DokterResepController::class, 'search'])->name('obat.search');
+    Route::get('/obat/autocomplete', [DokterResepController::class, 'autocomplete'])->name('obat.autocomplete');
+
+
+    Route::post('/dokter/resep/store-multiple', [DokterResepController::class, 'storeMultiple'])
+        ->name('dokter.resep.storeMultiple');
+
 
 
 

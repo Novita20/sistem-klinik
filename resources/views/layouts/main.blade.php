@@ -51,6 +51,8 @@
     <!-- ./wrapper -->
 
     @include('layouts.inc.ext-js')
+    @yield('scripts')
 </body>
+
 
 </html>

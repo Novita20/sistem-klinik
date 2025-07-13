@@ -27,8 +27,10 @@ class KunjunganController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'tgl_kunjungan' => 'required|date',
-            'keluhan' => 'required|string|max:1000',
+            'nid'            => 'required|string|max:20',
+            'nama'           => 'required|string|max:100',
+            'tgl_kunjungan'  => 'required|date',
+            'keluhan'        => 'required|string|max:1000',
         ]);
 
         $user = Auth::user();
@@ -38,19 +40,12 @@ class KunjunganController extends Controller
         if (!$pasien) {
             $pasien = Pasien::create([
                 'user_id' => $user->id,
-                'nid' => $request->nid,
-            ]);
-        } else {
-            // Update data pasien jika sudah ada
-            $pasien->update([
-                'tanggal_lahir' => $validated['tanggal_lahir'],
-                'jenis_kelamin' => $validated['jenis_kelamin'],
-                'alamat' => $validated['alamat'],
-                'no_hp' => $validated['no_hp'],
+                'nid'     => $validated['nid'],
+                'nama'    => $validated['nama'],
             ]);
         }
 
-        // Ubah waktu kunjungan dari WIB ke UTC untuk standardisasi
+        // Ubah waktu kunjungan dari WIB ke UTC
         $tglKunjungan = Carbon::parse($validated['tgl_kunjungan'], 'Asia/Jakarta')->setTimezone('UTC');
 
         // Simpan data kunjungan
@@ -59,7 +54,7 @@ class KunjunganController extends Controller
             'tgl_kunjungan' => $tglKunjungan,
             'keluhan'       => $validated['keluhan'],
             'paramedis_id'  => null,
-            'status'        => 'belum_ditangani', // ✅ default status
+            'status'        => 'belum_ditangani',
         ]);
 
         return redirect()->route('kunjungan.riwayat')->with('success', 'Data kunjungan berhasil disimpan!');
@@ -75,7 +70,7 @@ class KunjunganController extends Controller
 
         $riwayat = $pasien
             ? Kunjungan::with('rekamMedis.dokter')->where('pasien_id', $pasien->id)->latest()->get()
-            : collect(); // Koleksi kosong agar aman di Blade
+            : collect();
 
         return view('pasien.riwayat', compact('riwayat'));
     }

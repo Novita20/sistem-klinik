@@ -34,6 +34,31 @@ class DokterResepController extends Controller
 
         return view('dokter.resep.index', compact('reseps', 'search'));
     }
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+        $results = Obat::where('nama_obat', 'like', "%{$query}%")->limit(10)->get(['id', 'nama_obat', 'stok']);
+        return response()->json($results);
+    }
+    public function formItem()
+    {
+        $obats = Obat::all(); // ambil semua obat
+        return view('dokter.resep._form_item', compact('obat'));
+    }
+
+
+    public function autocomplete(Request $request)
+    {
+        $term = $request->q;
+
+        $data = \App\Models\Obat::where('nama_obat', 'like', "%$term%")
+            ->select('id', 'nama_obat')
+            ->limit(10)
+            ->get();
+
+        return response()->json($data);
+    }
+
 
     // 🧾 Form input resep oleh dokter
     public function create($rekam_medis_id)
@@ -43,6 +68,42 @@ class DokterResepController extends Controller
 
         return view('dokter.resep.create', compact('rekamMedis', 'obats'));
     }
+    public function storeMultiple(Request $request)
+    {
+        $request->validate([
+            'rekam_medis_id' => 'required|exists:rekam_medis,id',
+            'obat_id' => 'required|array|min:1',
+            'obat_id.*' => 'exists:obat,id',
+            'jumlah' => 'required|array|min:1',
+            'jumlah.*' => 'required|integer|min:1',
+            'dosis' => 'nullable|array',
+            'dosis.*' => 'nullable|string|max:255',
+            'aturan_pakai' => 'nullable|array',
+            'aturan_pakai.*' => 'nullable|string|max:255',
+        ]);
+
+
+        $rekamMedis = RekamMedis::with('kunjungan')->findOrFail($request->rekam_medis_id);
+        $pasienId = $rekamMedis->kunjungan->pasien_id;
+
+        foreach ($request->obat_id as $index => $obatId) {
+            ResepObat::create([
+                'rekam_medis_id' => $request->rekam_medis_id,
+                'obat_id' => $obatId,
+                'jumlah' => $request->jumlah[$index],
+                'dosis' => $request->dosis[$index] ?? null,
+                'aturan_pakai' => $request->aturan_pakai[$index] ?? null,
+                'pasien_id' => $rekamMedis->kunjungan->pasien_id,
+            ]);
+        }
+
+        // Tandai kunjungan sebagai selesai
+        $rekamMedis->kunjungan->update(['status' => 'selesai']);
+
+        return redirect()->route('dokter.kunjungan.detail', $rekamMedis->kunjungan->id)
+            ->with('success', 'Beberapa resep berhasil disimpan dan kunjungan selesai.');
+    }
+
 
     // 💾 Simpan resep baru oleh dokter
     public function store(Request $request)

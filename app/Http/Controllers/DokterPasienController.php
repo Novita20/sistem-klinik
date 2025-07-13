@@ -84,4 +84,68 @@ class DokterPasienController extends Controller
         return redirect()->route('dokter.kunjungan.detail', $kunjungan->id)
             ->with('success', 'Anamnesa berhasil disimpan.');
     }
+    public function edit($id)
+    {
+        $kunjungan = Kunjungan::with('pasien.user')->findOrFail($id);
+        return view('dokter.kunjungan_edit', compact('kunjungan'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $kunjungan = Kunjungan::findOrFail($id);
+
+        // Update data kunjungan
+        $kunjungan->update([
+            'tgl_kunjungan' => $request->tgl_kunjungan,
+            'keluhan' => $request->keluhan,
+            'status' => $request->status,
+        ]);
+
+        // Update rekam medis jika ada
+        if ($kunjungan->rekamMedis) {
+            $rekamMedis = $kunjungan->rekamMedis;
+            $rekamMedis->update([
+                'anamnesa' => $request->anamnesa,
+                'diagnosis' => $request->diagnosis,
+                'tindakan' => $request->tindakan,
+            ]);
+
+            // Update resep obat jika ada input
+            if ($request->has('reseps')) {
+                foreach ($request->reseps as $index => $resepInput) {
+                    $resep = $rekamMedis->resepObat[$index] ?? null;
+
+                    if ($resep) {
+                        $resep->update([
+                            'jumlah' => $resepInput['jumlah'],
+                            'dosis' => $resepInput['dosis'],
+                            'aturan_pakai' => $resepInput['aturan_pakai'],
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return redirect()->route('dokter.kunjungan')->with('success', 'Data kunjungan berhasil diperbarui.');
+    }
+    public function destroy($id)
+    {
+        $kunjungan = Kunjungan::findOrFail($id);
+
+        // Opsional: Jika ada relasi data yang harus ikut dihapus
+        if ($kunjungan->rekamMedis) {
+            // Hapus resep obat dulu kalau ada
+            if ($kunjungan->rekamMedis->resepObat) {
+                $kunjungan->rekamMedis->resepObat()->delete();
+            }
+
+            // Hapus rekam medis
+            $kunjungan->rekamMedis->delete();
+        }
+
+        // Terakhir, hapus kunjungan
+        $kunjungan->delete();
+
+        return redirect()->route('dokter.kunjungan')->with('success', 'Data kunjungan berhasil dihapus.');
+    }
 }
