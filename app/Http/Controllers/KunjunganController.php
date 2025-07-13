@@ -27,11 +27,6 @@ class KunjunganController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'tanggal_lahir' => 'required|date',
-            'jenis_kelamin' => 'required|in:L,P',
-            'alamat' => 'nullable|string|max:255',
-            'no_hp' => 'nullable|string|max:20',
             'tgl_kunjungan' => 'required|date',
             'keluhan' => 'required|string|max:1000',
         ]);
@@ -43,10 +38,7 @@ class KunjunganController extends Controller
         if (!$pasien) {
             $pasien = Pasien::create([
                 'user_id' => $user->id,
-                'tanggal_lahir' => $validated['tanggal_lahir'],
-                'jenis_kelamin' => $validated['jenis_kelamin'],
-                'alamat' => $validated['alamat'],
-                'no_hp' => $validated['no_hp'],
+                'nid' => $request->nid,
             ]);
         } else {
             // Update data pasien jika sudah ada
