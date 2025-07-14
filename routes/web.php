@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\DashboardDokterController;
 use App\Http\Controllers\DashboardParamedisController;
 use App\Http\Controllers\DokterPasienController;
 use App\Http\Controllers\DokterRekamMedisController;
@@ -71,9 +72,10 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/paramedis/dashboard', [DashboardParamedisController::class, 'index'])->name('paramedis.dashboard');
 
-    Route::get('/dokter/dashboard', function () {
-        return view('dokter.dashboard');
-    })->name('dokter.dashboard');
+    Route::get('/dokter/dashboard', [DashboardDokterController::class, 'dashboard'])->name('dokter.dashboard');
+    // Route::get('/dokter/dashboard', function () {
+    //     return view('dokter.dashboard');
+    // })->name('dokter.dashboard');
 
     Route::get('/k3/dashboard', function () {
         return view('k3.dashboard');
