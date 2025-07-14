@@ -1,11 +1,19 @@
 @extends('layouts.main')
-
 @section('content-header')
-    <div class="p-4">
-        <h1 class="text-3xl font-bold text-indigo-800">🩺 Dashboard Dokter</h1>
-        <p class="text-gray-600">Selamat datang kembali, {{ Auth::user()->name }}.</p>
+    <div class="p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-indigo-800">🩺 Dashboard Dokter</h1>
+            <p class="text-gray-600">Selamat datang kembali, {{ Auth::user()->name }}.</p>
+        </div>
+
+        <div class="mt-2 md:mt-0">
+            <span class="bg-white text-primary border border-primary py-2 px-3 rounded text-sm" id="realtime-clock">
+                <!-- Waktu realtime akan muncul di sini -->
+            </span>
+        </div>
     </div>
 @endsection
+
 
 @section('content')
     <div class="p-6 space-y-8">
@@ -80,3 +88,29 @@
         </div>
     </div>
 @endsection
+
+
+@push('scripts')
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September',
+                'Oktober', 'November', 'Desember'
+            ];
+            const hariIni = hari[now.getDay()];
+            const tanggal = now.getDate();
+            const bulanIni = bulan[now.getMonth()];
+            const tahun = now.getFullYear();
+            let jam = now.getHours().toString().padStart(2, '0');
+            let menit = now.getMinutes().toString().padStart(2, '0');
+            let detik = now.getSeconds().toString().padStart(2, '0');
+
+            document.getElementById('realtime-clock').innerHTML =
+                `<span class="text-secondary">${hariIni}, ${tanggal} ${bulanIni} ${tahun} • </span><span class="text-primary fw-bold">${jam}:${menit}:${detik}</span>`;
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
+@endpush
