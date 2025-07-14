@@ -17,7 +17,12 @@
                 <div class="alert alert-danger mb-4">{{ session('error') }}</div>
             @endif
 
-            @if ($resepObat->isEmpty())
+            @php
+                // Group resep obat berdasarkan rekam medis ID
+                $grouped = $resepObat->groupBy('rekam_medis_id');
+            @endphp
+
+            @if ($grouped->isEmpty())
                 <div class="text-center text-gray-600">Belum ada resep obat yang tersedia.</div>
             @else
                 <table class="min-w-[1000px] w-full border border-gray-300 text-sm text-left">
@@ -34,21 +39,49 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($resepObat as $resep)
-                            <tr class="hover:bg-gray-50">
+                        @foreach ($grouped as $index => $group)
+                            @php
+                                $first = $group->first();
+                                $kunjungan = optional($first->rekamMedis->kunjungan);
+                            @endphp
+                            <tr class="hover:bg-gray-50 align-top">
                                 <td class="border px-3 py-2 text-center">{{ $loop->iteration }}</td>
                                 <td class="border px-3 py-2 text-center">
-                                    {{ optional($resep->rekamMedis->kunjungan)->tgl_kunjungan
-                                        ? \Carbon\Carbon::parse($resep->rekamMedis->kunjungan->tgl_kunjungan)->format('d-m-Y H:i')
+                                    {{ $kunjungan && $kunjungan->tgl_kunjungan
+                                        ? \Carbon\Carbon::parse($kunjungan->tgl_kunjungan)->format('d-m-Y H:i')
                                         : '-' }}
                                 </td>
-                                <td class="border px-3 py-2">{{ $resep->rekamMedis->kunjungan->keluhan ?? '-' }}</td>
-                                <td class="border px-3 py-2">{{ $resep->obat->nama_obat ?? 'Obat Tidak Ditemukan' }}</td>
-                                <td class="border px-3 py-2 text-center">{{ $resep->jumlah }} tablet</td>
-                                <td class="border px-3 py-2">{{ $resep->dosis ?? '-' }}</td>
-                                <td class="border px-3 py-2">{{ $resep->aturan_pakai ?? '-' }}</td>
+                                <td class="border px-3 py-2">{{ $kunjungan->keluhan ?? '-' }}</td>
+                                <td class="border px-3 py-2">
+                                    <ul class="list-disc list-inside">
+                                        @foreach ($group as $resep)
+                                            <li>{{ $resep->obat->nama_obat ?? 'Obat Tidak Ditemukan' }}</li>
+                                        @endforeach
+                                    </ul>
+                                </td>
+                                <td class="border px-3 py-2">
+                                    <ul class="list-disc list-inside">
+                                        @foreach ($group as $resep)
+                                            <li>{{ $resep->jumlah }} tablet</li>
+                                        @endforeach
+                                    </ul>
+                                </td>
+                                <td class="border px-3 py-2">
+                                    <ul class="list-disc list-inside">
+                                        @foreach ($group as $resep)
+                                            <li>{{ $resep->dosis ?? '-' }}</li>
+                                        @endforeach
+                                    </ul>
+                                </td>
+                                <td class="border px-3 py-2">
+                                    <ul class="list-disc list-inside">
+                                        @foreach ($group as $resep)
+                                            <li>{{ $resep->aturan_pakai ?? '-' }}</li>
+                                        @endforeach
+                                    </ul>
+                                </td>
                                 <td class="border px-3 py-2 text-center">
-                                    {{ $resep->created_at->format('d-m-Y H:i') }}
+                                    {{ \Carbon\Carbon::parse($first->created_at)->format('d-m-Y H:i') }}
                                 </td>
                             </tr>
                         @endforeach
