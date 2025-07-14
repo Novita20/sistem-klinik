@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Kunjungan;
 use App\Models\Pasien;
 use App\Models\RekamMedis;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RekamMedisController extends Controller
 {
@@ -33,6 +34,23 @@ class RekamMedisController extends Controller
             ->paginate(10);
 
         return view('pasien.rm', compact('rekammedis'));
+    }
+    public function show($id)
+    {
+        $rekamMedis = RekamMedis::with([
+            'kunjungan.pasien.user',
+            'resepObat.obat'
+        ])->findOrFail($id);
+
+        return view('sdm.rekammedis.detail', compact('rekamMedis'));
+    }
+
+    public function exportPdf($id)
+    {
+        $rekamMedis = RekamMedis::with(['kunjungan.pasien.user', 'resepObat.obat'])->findOrFail($id);
+
+        $pdf = Pdf::loadView('sdm.rekammedis.pdf', compact('rekamMedis'));
+        return $pdf->stream('rekam_medis_' . $rekamMedis->id . '.pdf');
     }
 
 

@@ -289,6 +289,10 @@ Route::get('/debug-mail', function () {
 
 Route::get('/sdm/rekam-medis', [SdmRekamMedisController::class, 'index'])->name('sdm.rekammedis.index');
 Route::get('/sdm/rekam-medis/export', [SdmRekamMedisController::class, 'export'])->name('rekam_medis.export');
+Route::get('/sdm/rekam-medis/{id}', [RekamMedisController::class, 'show'])->name('sdm.rekammedis.show');
+Route::get('/sdm/rekam-medis/{id}/pdf', [RekamMedisController::class, 'exportPdf'])->name('sdm.rekammedis.pdf');
+
+
 
 
 // Tampilkan laporan penggunaan obat
