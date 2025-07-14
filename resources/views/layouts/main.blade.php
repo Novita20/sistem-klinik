@@ -52,6 +52,8 @@
 
     @include('layouts.inc.ext-js')
     @yield('scripts')
+    @stack('scripts')
+
 </body>
 
 

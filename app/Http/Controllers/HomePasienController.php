@@ -11,16 +11,37 @@ class HomePasienController extends Controller
 {
     public function index()
     {
-        $totalKunjungan = 5;
-        $kunjunganTerakhir = null;
-        $diagnosaTerakhir = '-';
+        $user = Auth::user();
+        $pasien = Pasien::where('user_id', $user->id)->first();
+
+        $totalKunjungan = $pasien ? $pasien->kunjungan()->count() : 0;
+
+        $kunjunganTerakhir = $pasien ? $pasien->kunjungan()->latest()->first() : null;
+        $rekamMedisTerakhir = $kunjunganTerakhir ? $kunjunganTerakhir->rekamMedis : null;
+
+        // ✅ Diagnosa terakhir
+        $diagnosaTerakhir = $rekamMedisTerakhir ? $rekamMedisTerakhir->diagnosis : '-';
+
+        // ✅ Tekanan darah terakhir
+        $tekananDarahTerakhir = '-';
+        if ($rekamMedisTerakhir && $rekamMedisTerakhir->ttv) {
+            $ttv = json_decode($rekamMedisTerakhir->ttv, true);
+            $tekananDarahTerakhir = $ttv['tekanan_darah'] ?? '-';
+        }
+        // ✅ Alternatif baru: status penanganan terakhir
+        $kunjunganHariIni = $pasien
+            ? $pasien->kunjungan()->whereDate('tgl_kunjungan', today())->exists()
+            : false;
 
         return view('pasien.dashboard', compact(
             'totalKunjungan',
-            'kunjunganTerakhir',
-            'diagnosaTerakhir'
+            'diagnosaTerakhir',
+            'tekananDarahTerakhir',
+            'rekamMedisTerakhir',
+            'kunjunganHariIni'
         ));
     }
+
 
 
     public function create()
