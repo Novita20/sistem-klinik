@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\DashboardDokterController;
 use App\Http\Controllers\DashboardK3Controller;
 use App\Http\Controllers\DashboardParamedisController;
+use App\Http\Controllers\DashboardSdmController;
 use App\Http\Controllers\DokterPasienController;
 use App\Http\Controllers\DokterRekamMedisController;
 use App\Http\Controllers\DokterResepController;
@@ -77,9 +78,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/k3/dashboard', [DashboardK3Controller::class, 'dashboard'])->name('dashboard.k3');
 
-    Route::get('/sdm/dashboard', function () {
-        return view('sdm.dashboard');
-    })->name('sdm.dashboard');
+    Route::get('/sdm/dashboard', [DashboardSdmController::class, 'dashboard'])->name('dashboard.sdm');
 
     // ========================
     // 📋 KUNJUNGAN (UMUM/PASIEN)
