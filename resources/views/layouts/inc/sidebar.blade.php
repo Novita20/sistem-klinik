@@ -100,89 +100,95 @@
 
                     {{-- 🔷 Modul 1: Rawat Jalan --}}
                     <li class="nav-item has-treeview {{ $isRawatJalan ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ $isRawatJalan ? 'active' : '' }}">
-                            <p>
-                                Rawat Jalan
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
+                        <a href="#"
+                            class="nav-link d-flex justify-content-between align-items-center {{ $isRawatJalan ? 'active bg-primary text-white' : 'text-white' }}"
+                            style="padding: 10px 15px; border-radius: 6px;">
+                            <span><i class="fas fa-clinic-medical me-2"></i> Rawat Jalan</span>
+                            <i class="fas fa-angle-left"></i>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('paramedis.kunjungan.index') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'paramedis.kunjungan.index' ? 'active' : '' }}">
-                                    <i class="fas fa-notes-medical nav-icon"></i>
+                                    class="nav-link {{ $routeName === 'paramedis.kunjungan.index' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-notes-medical nav-icon text-info"></i>
                                     <p>Data Kunjungan</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('paramedis.kunjungan.riwayat') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'paramedis.kunjungan.riwayat' ? 'active' : '' }}">
-                                    <i class="fas fa-history nav-icon"></i>
+                                    class="nav-link {{ $routeName === 'paramedis.kunjungan.riwayat' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-history nav-icon text-warning"></i>
                                     <p>Riwayat Kunjungan</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('paramedis.pemeriksaan.awal') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'paramedis.pemeriksaan.awal' ? 'active' : '' }}">
-                                    <i class="fas fa-stethoscope nav-icon"></i>
+                                    class="nav-link {{ $routeName === 'paramedis.pemeriksaan.awal' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-stethoscope nav-icon text-success"></i>
                                     <p>Pemeriksaan Awal</p>
                                 </a>
                             </li>
-
                             <li class="nav-item">
                                 <a href="{{ route('paramedis.rekammedis.index') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'paramedis.rekammedis.index' ? 'active' : '' }}">
-                                    <i class="fas fa-file-medical nav-icon"></i>
-                                    <p>Rekam Medis (Lihat)</p>
+                                    class="nav-link {{ $routeName === 'paramedis.rekammedis.index' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-file-medical nav-icon text-danger"></i>
+                                    <p>Rekam Medis</p>
                                 </a>
                             </li>
-
                             <li class="nav-item">
                                 <a href="{{ route('paramedis.resep.index') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'paramedis.resep.index' ? 'active' : '' }}">
-                                    <i class="fas fa-pills nav-icon"></i>
+                                    class="nav-link {{ $routeName === 'paramedis.resep.index' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-pills nav-icon text-primary"></i>
                                     <p>Daftar Resep Obat</p>
                                 </a>
-
                             </li>
                         </ul>
                     </li>
 
                     {{-- 🔷 Modul 2: Manajemen Stok Obat --}}
                     <li class="nav-item has-treeview {{ $isStokObat ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ $isStokObat ? 'active' : '' }}">
-                            <p>
-                                Manajemen Stok Obat
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
+                        <a href="#"
+                            class="nav-link d-flex justify-content-between align-items-center {{ $isStokObat ? 'active bg-primary text-white' : 'text-white' }}"
+                            style="padding: 10px 15px; border-radius: 6px;">
+                            <span><i class="fas fa-capsules me-2"></i> Manajemen Stok Obat</span>
+                            <i class="fas fa-angle-left"></i>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('obat.index') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'obat.index' ? 'active' : '' }}">
-                                    <i class="fas fa-table nav-icon"></i>
+                                    class="nav-link {{ $routeName === 'obat.index' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-table nav-icon text-info"></i>
                                     <p>Input Obat</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('logobat.mutasi') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'logobat.mutasi' ? 'active' : '' }}">
-                                    <i class="nav-icon fas fa-exchange-alt"></i>
+                                    class="nav-link {{ $routeName === 'logobat.mutasi' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-exchange-alt nav-icon text-warning"></i>
                                     <p>Mutasi Obat</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('obat.rekap') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'obat.rekap' ? 'active' : '' }}">
-                                    <i class="fas fa-chart-bar nav-icon"></i>
-                                    <p>Rekap Penggunaan Obat</p>
+                                    class="nav-link {{ $routeName === 'obat.rekap' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-chart-bar nav-icon text-success"></i>
+                                    <p>Rekap Obat</p>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="{{ route('paramedis.restock.index') }}"
-                                    class="nav-link pl-4 {{ $routeName === 'paramedis.restock.index' ? 'active' : '' }}">
-                                    <i class="fas fa-truck-loading nav-icon"></i>
-                                    <p>Pengajuan Restok Obat</p>
+                                    class="nav-link {{ $routeName === 'paramedis.restock.index' ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-truck-loading nav-icon text-danger"></i>
+                                    <p>Pengajuan Restok</p>
                                 </a>
                             </li>
                         </ul>
@@ -190,25 +196,24 @@
 
                     {{-- 🔷 Modul 3: Profil --}}
                     <li class="nav-item has-treeview {{ $isProfil ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ $isProfil ? 'active' : '' }}">
-                            <p>
-                                Profil
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
+                        <a href="#"
+                            class="nav-link d-flex justify-content-between align-items-center {{ $isProfil ? 'active bg-primary text-white' : 'text-white' }}"
+                            style="padding: 10px 15px; border-radius: 6px;">
+                            <span><i class="fas fa-user-circle me-2"></i> Profil</span>
+                            <i class="fas fa-angle-left"></i>
                         </a>
                         <ul class="nav nav-treeview">
                             <li class="nav-item">
                                 <a href="{{ route('profile.edit') }}"
-                                    class="nav-link pl-4 {{ $isProfil ? 'active' : '' }}">
-                                    <i class="fas fa-user nav-icon"></i>
+                                    class="nav-link {{ $isProfil ? 'active bg-light text-primary fw-bold' : 'text-white' }}"
+                                    style="padding-left: 30px; border-radius: 5px;">
+                                    <i class="fas fa-user nav-icon text-secondary"></i>
                                     <p>Edit Profil</p>
                                 </a>
                             </li>
                         </ul>
                     </li>
                 @endif
-
-
 
 
 

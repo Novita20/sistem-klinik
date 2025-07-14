@@ -34,6 +34,7 @@
                 <thead class="bg-gray-100 text-gray-700 text-center">
                     <tr>
                         <th class="border px-3 py-2">No</th>
+                        <th class="border px-3 py-2">NID</th>
                         <th class="border px-3 py-2">Nama Pasien</th>
                         <th class="border px-3 py-2">Keluhan</th>
                         <th class="border px-3 py-2">Tanggal Kunjungan</th>
@@ -45,6 +46,9 @@
                     @forelse ($rekammedis as $index => $rm)
                         <tr class="hover:bg-gray-50">
                             <td class="border px-3 py-2 text-center">{{ $rekammedis->firstItem() + $index }}</td>
+                            <td class="border px-3 py-2">
+                                {{ $rm->kunjungan->pasien->user->nid ?? '-' }} {{-- Tampilkan NID --}}
+                            </td>
                             <td class="border px-3 py-2">{{ $rm->kunjungan->pasien->user->name ?? '-' }}</td>
                             <td class="border px-3 py-2">{{ $rm->kunjungan->keluhan ?? '-' }}</td>
                             <td class="border px-3 py-2">
