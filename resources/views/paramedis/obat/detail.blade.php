@@ -36,8 +36,10 @@
                             <td class="py-2 px-4 border">{{ $batch->jumlah }}</td>
                             <td class="py-2 px-4 border">{{ \Carbon\Carbon::parse($batch->tgl_transaksi)->format('d-m-Y') }}
                             </td>
-                            <td class="py-2 px-4 border">{{ \Carbon\Carbon::parse($batch->expired_at)->format('d-m-Y') }}
+                            <td class="py-2 px-4 border">
+                                {{ \Carbon\Carbon::parse($batch->expired_at)->format('d-m-Y') }}
                             </td>
+
                             <td class="py-2 px-4 border">
                                 <a href="{{ route('stokobat.edit', $batch->id) }}"
                                     class="text-yellow-600 hover:underline">Edit</a>

@@ -23,7 +23,7 @@
                 <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     Cari
                 </button>
-                @if (request('search'))
+                @if (strlen(request('search')) > 0)
                     <a href="{{ route('logobat.mutasi') }}"
                         class="text-sm text-red-500 ml-2 hover:underline whitespace-nowrap">Reset</a>
                 @endif
@@ -39,7 +39,7 @@
                         <th class="px-4 py-2 border">Nama Obat</th>
                         <th class="px-4 py-2 border">Jenis Mutasi</th>
                         <th class="px-4 py-2 border">Jumlah</th>
-                        <th class="px-4 py-2 border">Stok Awal</th>
+                        {{-- <th class="px-4 py-2 border">Stok Awal</th> --}}
                         <th class="px-4 py-2 border">Sisa Stok</th>
                         <th class="px-4 py-2 border">Tgl Transaksi</th>
                         <th class="px-4 py-2 border">Tgl Expired</th>
@@ -55,13 +55,14 @@
                             <td class="px-4 py-2 border">{{ $log->obat->nama_obat ?? '-' }}</td>
                             <td class="px-4 py-2 border text-blue-700 font-semibold">{{ ucfirst($log->jenis_mutasi) }}</td>
                             <td class="px-4 py-2 border">{{ $log->jumlah }}</td>
-                            <td class="px-4 py-2 border">{{ $log->stok_awal ?? 0 }}</td>
+                            {{-- <td class="px-4 py-2 border">{{ $log->stok_awal ?? 0 }}</td> --}}
                             <td class="px-4 py-2 border">{{ $log->sisa_stok ?? '-' }}</td>
                             <td class="px-4 py-2 border">
                                 {{ $log->tgl_transaksi ? \Carbon\Carbon::parse($log->tgl_transaksi)->format('d-m-Y') : '-' }}
                             </td>
                             <td class="py-2 px-4 border">{{ \Carbon\Carbon::parse($log->expired_at)->format('d-m-Y') }}
                             </td>
+
                             <td class="px-4 py-2 border">{{ $log->keterangan ?? '-' }}</td>
                             <td class="px-4 py-2 border">
                                 @if ($log->ref_type === 'obat')
