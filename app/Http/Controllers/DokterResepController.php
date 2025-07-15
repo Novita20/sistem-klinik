@@ -120,16 +120,6 @@ class DokterResepController extends Controller
 
         Log::info('Validasi sukses');
 
-        // $obat = Obat::findOrFail($request->obat_id);
-        // if ($request->jumlah > $obat->stok) {
-        //     Log::warning('Stok tidak cukup', ['stok' => $obat->stok, 'diminta' => $request->jumlah]);
-        //     return back()->withErrors(['jumlah' => 'Jumlah melebihi stok tersedia'])->withInput();
-        // }
-
-        // $obat->stok -= $request->jumlah;
-        // $obat->save();
-        // Log::info('Stok berhasil dikurangi');
-
         $rekamMedis = RekamMedis::with('kunjungan')->findOrFail($request->rekam_medis_id);
         $pasienId = $rekamMedis->kunjungan->pasien_id;
 

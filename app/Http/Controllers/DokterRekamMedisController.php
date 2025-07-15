@@ -79,22 +79,20 @@ class DokterRekamMedisController extends Controller
         $rekam->anamnesa = $request->anamnesa;
         $rekam->save();
 
-        // ✅ HARUS INI!
+        // ✅ Update status ke anamnesa_dokter
         $kunjungan = Kunjungan::findOrFail($request->kunjungan_id);
-        $kunjungan->status = 'menunggu_pemeriksaan_paramedis';
+        $kunjungan->status = 'anamnesa_dokter';
         $kunjungan->save();
-
 
         return redirect()->route('dokter.kunjungan.detail', $kunjungan->id)
             ->with('success', 'Anamnesa berhasil disimpan.');
     }
 
-
     public function update(Request $request, $id)
     {
         $request->validate([
             'diagnosis' => 'required|string',
-            'tindakan' => 'nullable|string', // ini penting
+            'tindakan' => 'required|string',
         ]);
 
         $rekam = RekamMedis::findOrFail($id);
@@ -102,12 +100,13 @@ class DokterRekamMedisController extends Controller
         $rekam->tindakan = $request->tindakan;
         $rekam->save();
 
-        // Update status kunjungan jika perlu
-        $kunjungan = $rekam->kunjungan;
-        $kunjungan->status = 'tindakan_dokter';
-        $kunjungan->save();
+        // ✅ Update status kunjungan ke 'tindakan_dokter'
+        if ($rekam->kunjungan) {
+            $kunjungan = $rekam->kunjungan;
+            $kunjungan->status = 'tindakan_dokter';
+            $kunjungan->save();
+        }
 
-        return redirect()->route('dokter.kunjungan.detail', $rekam->kunjungan_id)
-            ->with('success', 'Diagnosis dan Tindakan berhasil disimpan.');
+        return redirect()->back()->with('success', 'Diagnosa dan tindakan berhasil disimpan.');
     }
 }

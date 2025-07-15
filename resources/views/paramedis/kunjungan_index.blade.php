@@ -15,8 +15,7 @@
                         <tr>
                             <th class="px-4 py-2 border">No.</th>
                             <th class="px-4 py-2 border">Nama Pasien</th>
-                            <th class="px-4 py-2 border">Tanggal Kunjungan
-                            </th>
+                            <th class="px-4 py-2 border">Tanggal Kunjungan </th>
                             <th class="px-4 py-2 border">Keluhan</th>
                             <th class="px-4 py-2 border">Status</th>
                             <th class="px-4 py-2 border">Aksi</th>
@@ -30,8 +29,11 @@
                                     {{ $item->pasien->user->name ?? '-' }}
                                 </td>
                                 <td class="px-4 py-2 border">
-                                    {{ $item->tgl_kunjungan ? \Carbon\Carbon::parse($item->tgl_kunjungan)->format('d-m-Y H:i') : '-' }}
+                                    {{ $item->tgl_kunjungan ? \Carbon\Carbon::parse($item->tgl_kunjungan)->setTimezone('Asia/Jakarta')->format('d-m-Y H:i') . ' WIB' : '-' }}
                                 </td>
+
+
+
                                 <td class="px-4 py-2 border">
                                     {{ $item->keluhan ?? '-' }}
                                 </td>

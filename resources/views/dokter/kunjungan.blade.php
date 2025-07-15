@@ -9,7 +9,6 @@
 @section('content')
     <div class="p-6">
         <div class="bg-white p-4 rounded-lg shadow">
-
             {{-- 🔍 Form Cari --}}
             <form method="GET" action="{{ route('dokter.kunjungan') }}" class="mb-4 flex items-center gap-2">
                 <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama pasien..."
@@ -35,28 +34,54 @@
                     <tbody>
                         @foreach ($kunjungan as $k)
                             <tr class="border-t">
-                                <td class="px-4 py-2">{{ $loop->iteration }}</td>
+                                <td class="px-4 py-2 text-center">{{ $loop->iteration }}</td>
                                 <td class="px-4 py-2">{{ $k->pasien->user->name ?? '-' }}</td>
                                 <td class="px-4 py-2">
-                                    {{ \Carbon\Carbon::parse($k->tgl_kunjungan)->format('d-m-Y H:i') }}
+                                    {{ \Carbon\Carbon::parse($k->tgl_kunjungan)->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
+                                    WIB
                                 </td>
                                 <td class="px-4 py-2">{{ $k->keluhan ?? '-' }}</td>
                                 <td class="px-4 py-2">
                                     @php
                                         $status = $k->status ?? 'belum_ditangani';
-                                        $label =
-                                            [
-                                                'belum_ditangani' => 'text-yellow-600',
-                                                'anamnesa_dokter' => 'text-blue-600',
-                                                'menunggu_pemeriksaan_paramedis' => 'text-indigo-600',
-                                                'selesai_pemeriksaan_paramedis' => 'text-green-600',
-                                                'tindakan_dokter' => 'text-purple-600',
-                                                'selesai' => 'text-gray-700',
-                                            ][$status] ?? 'text-red-600';
                                     @endphp
-                                    <span class="font-semibold {{ $label }}">
-                                        {{ ucwords(str_replace('_', ' ', $status)) }}
-                                    </span>
+
+                                    @switch($status)
+                                        @case('belum_ditangani')
+                                            <span class="text-yellow-600 font-semibold">Belum Ditangani</span>
+                                        @break
+
+                                        @case('menunggu_pemeriksaan_paramedis')
+                                            <span class="text-indigo-600 font-semibold">Menunggu Pemeriksaan Paramedis</span>
+                                        @break
+
+                                        @case('selesai_pemeriksaan_paramedis')
+                                            <span class="text-green-600 font-semibold">Selesai Diperiksa Paramedis</span>
+                                        @break
+
+                                        @case('anamnesa_dokter')
+                                            <span class="text-blue-600 font-semibold">Anamnesa Dokter</span>
+                                        @break
+
+                                        @case('tindakan_dokter')
+                                            <span class="text-purple-600 font-semibold">Tindakan oleh Dokter</span>
+                                        @break
+
+                                        @case('selesai_pemeriksaan_dokter')
+                                            <span class="text-green-700 font-semibold">Selesai Pemeriksaan Dokter</span>
+                                        @break
+
+                                        @case('resep_diberikan')
+                                            <span class="text-pink-700 font-semibold">Resep Diberikan</span>
+                                        @break
+
+                                        @case('selesai')
+                                            <span class="text-gray-700 font-semibold">Selesai</span>
+                                        @break
+
+                                        @default
+                                            <span class="text-red-600 font-semibold">Status Tidak Dikenal</span>
+                                    @endswitch
                                 </td>
                                 <td class="px-4 py-2 flex gap-2">
                                     {{-- 🔍 Detail --}}

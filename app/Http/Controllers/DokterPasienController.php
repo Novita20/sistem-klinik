@@ -97,48 +97,58 @@ class DokterPasienController extends Controller
     }
     public function edit($id)
     {
-        $kunjungan = Kunjungan::with('pasien.user')->findOrFail($id);
+        $kunjungan = Kunjungan::with([
+            'pasien.user',
+            'rekamMedis.resepObat.obat'
+        ])->findOrFail($id);
+
         return view('dokter.kunjungan_edit', compact('kunjungan'));
     }
 
+
     public function update(Request $request, $id)
     {
-        $kunjungan = Kunjungan::findOrFail($id);
+        $request->validate([
+            'tgl_kunjungan' => 'required|date',
+            'keluhan' => 'required|string',
+            'status' => 'required|string',
+            'anamnesa' => 'nullable|string',
+            'diagnosis' => 'nullable|string',
+            'tindakan' => 'nullable|string',
+        ]);
 
-        // Update data kunjungan
+        // 1. Update kunjungan
+        $kunjungan = \App\Models\Kunjungan::findOrFail($id);
         $kunjungan->update([
             'tgl_kunjungan' => $request->tgl_kunjungan,
             'keluhan' => $request->keluhan,
             'status' => $request->status,
         ]);
 
-        // Update rekam medis jika ada
         if ($kunjungan->rekamMedis) {
-            $rekamMedis = $kunjungan->rekamMedis;
-            $rekamMedis->update([
+            $kunjungan->rekamMedis->update([
                 'anamnesa' => $request->anamnesa,
                 'diagnosis' => $request->diagnosis,
                 'tindakan' => $request->tindakan,
             ]);
 
-            // Update resep obat jika ada input
-            if ($request->has('reseps')) {
-                foreach ($request->reseps as $index => $resepInput) {
-                    $resep = $rekamMedis->resepObat[$index] ?? null;
-
-                    if ($resep) {
-                        $resep->update([
-                            'jumlah' => $resepInput['jumlah'],
-                            'dosis' => $resepInput['dosis'],
-                            'aturan_pakai' => $resepInput['aturan_pakai'],
-                        ]);
-                    }
-                }
+            // Tambahkan logika ini:
+            if (!empty($request->diagnosis) && !empty($request->tindakan)) {
+                $kunjungan->status = 'tindakan_dokter';
+                $kunjungan->save();
             }
         }
 
-        return redirect()->route('dokter.kunjungan')->with('success', 'Data kunjungan berhasil diperbarui.');
+
+        // 3. (Optional) update resep jika kamu mengizinkan
+        // tapi hati-hati, input resep obat kamu di Blade readonly di nama_obat (id-nya tidak ikut dikirim)
+
+        return redirect()->route('dokter.kunjungan.detail', $kunjungan->id)
+            ->with('success', 'Data kunjungan berhasil diperbarui.');
     }
+
+
+
     public function destroy($id)
     {
         $kunjungan = Kunjungan::findOrFail($id);
