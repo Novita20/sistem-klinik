@@ -15,26 +15,44 @@
 
         {{-- 🔍 Filter Tanggal dan Pencarian --}}
         <form method="GET" action="{{ route('laporan_obat') }}" class="row g-3 align-items-end mb-4">
+
+            {{-- 🔹 Dari Tanggal --}}
             <div class="col-md-3">
                 <label for="start_date" class="form-label fw-semibold">Dari Tanggal</label>
                 <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
             </div>
 
+            {{-- 🔹 Sampai Tanggal --}}
             <div class="col-md-3">
                 <label for="end_date" class="form-label fw-semibold">Sampai Tanggal</label>
                 <input type="date" name="end_date" class="form-control" value="{{ request('end_date') }}">
             </div>
 
-            <div class="col-md-4">
-                <label for="search" class="form-label fw-semibold">Cari Nama Obat</label>
-                <input type="text" name="search" class="form-control" placeholder="Contoh: Paracetamol"
-                    value="{{ request('search') }}">
+            {{-- 🔘 Tombol Filter & Reset --}}
+            <div class="col-md-2 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-secondary">
+                    📅 Filter
+                </button>
+                <a href="{{ route('laporan_obat') }}" class="btn btn-outline-secondary btn-sm">
+                    🔁 Reset
+                </a>
             </div>
 
-            <div class="col-md-2 d-grid">
-                <button type="submit" class="btn btn-primary">🔍 Cari</button>
+            {{-- 🔍 Pencarian Obat (Dorong ke kanan) --}}
+            <div class="col-md-4 ms-auto d-flex align-items-end justify-content-end gap-2">
+                <div style="min-width: 220px;">
+                    <label for="search" class="form-label fw-semibold">Cari Nama Obat</label>
+                    <input type="text" name="search" class="form-control" placeholder="Contoh: Paracetamol"
+                        value="{{ request('search') }}">
+                </div>
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary mt-4">🔍 Cari</button>
+                </div>
             </div>
+
         </form>
+
+
 
         {{-- 📊 Tabel Laporan Penggunaan Obat --}}
         <div class="card shadow">

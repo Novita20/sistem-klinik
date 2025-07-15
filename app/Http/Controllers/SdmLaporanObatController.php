@@ -11,12 +11,11 @@ use App\Exports\SdmLaporanObatExport;
 
 class SdmLaporanObatController extends Controller
 {
-    // 🔍 Tampilkan laporan di blade
     public function index(Request $request)
     {
         $query = ResepObat::with('obat');
 
-        // Filter berdasarkan tanggal kunjungan (created_at dari resep)
+        // Filter tanggal penggunaan obat
         if ($request->filled('start_date')) {
             $query->whereDate('created_at', '>=', $request->start_date);
         }
@@ -34,22 +33,21 @@ class SdmLaporanObatController extends Controller
 
         $resepList = $query->get();
 
-        // Proses data menjadi laporan ringkas (group by nama_obat)
-        $data = $resepList->groupBy('obat_id')->map(function ($items) {
+        // Grouping berdasarkan kombinasi: obat_id + tanggal penggunaan
+        $grouped = $resepList->groupBy(function ($item) {
+            return $item->obat_id . '|' . $item->created_at->format('Y-m-d');
+        });
+
+        // Format data agar tidak hilang tiap pemakaian per hari
+        $data = $grouped->map(function ($items) {
             $first = $items->first();
             return [
                 'nama_obat' => $first->obat->nama_obat ?? '-',
                 'frekuensi' => $items->count(),
-                'terakhir_digunakan' => $items->max('created_at'),
+                'terakhir_digunakan' => $first->created_at->format('d-m-Y'),
             ];
-        })->sortByDesc('frekuensi')->values()->all();
+        })->values()->all();
 
         return view('sdm.laporan.index', compact('data'));
-    }
-
-    // 📥 Export ke Excel
-    public function export(Request $request)
-    {
-        return Excel::download(new SdmLaporanObatExport($request), 'laporan_penggunaan_obat.xlsx');
     }
 }
