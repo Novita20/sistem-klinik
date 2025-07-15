@@ -2,53 +2,60 @@
 
 @section('content-header')
     <div class="p-4">
-        <h1 class="text-2xl font-bold">Edit Obat</h1>
+        <h1 class="text-2xl font-bold">Edit Batch Obat</h1>
     </div>
 @endsection
 
 @section('content')
-    <div class="p-6">
-        <form action="{{ route('obat.update', $obat->id) }}" method="POST">
+    <div class="p-6 max-w-xl mx-auto bg-white rounded-lg shadow-md">
+
+        @if (session('success'))
+            <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-800 rounded shadow">
+                ✅ {{ session('success') }}
+            </div>
+        @endif
+
+        <form action="{{ route('stokobat.update', $logObat->id) }}" method="POST">
             @csrf
             @method('PUT')
 
+            {{-- Nama Obat (readonly) --}}
             <div class="mb-4">
-                <label for="nama_obat">Nama Obat</label>
-                <input type="text" name="nama_obat" value="{{ old('nama_obat', $obat->nama_obat) }}"
-                    class="form-input w-full">
+                <label for="nama_obat" class="block text-sm font-medium text-gray-700">Nama Obat</label>
+                <input type="text" id="nama_obat" value="{{ $logObat->obat->nama_obat }}"
+                    class="form-input w-full bg-gray-100 cursor-not-allowed" disabled>
             </div>
 
+            {{-- Jumlah (Stok) --}}
             <div class="mb-4">
-                <label for="jenis_obat">Jenis Obat</label>
-                <input type="text" name="jenis_obat" value="{{ old('jenis_obat', $obat->jenis_obat) }}"
-                    class="form-input w-full">
+                <label for="jumlah" class="block text-sm font-medium text-gray-700">Jumlah Stok</label>
+                <input type="number" name="jumlah" id="jumlah" value="{{ old('jumlah', $logObat->jumlah) }}"
+                    class="form-input w-full" min="1" required>
             </div>
 
+            {{-- Tanggal Transaksi --}}
             <div class="mb-4">
-                <label for="stok">Stok</label>
-                <input type="number" name="stok" value="{{ old('stok', $obat->stok) }}" class="form-input w-full">
+                <label for="tgl_transaksi" class="block text-sm font-medium text-gray-700">Tanggal Input</label>
+                <input type="date" name="tgl_transaksi" id="tgl_transaksi"
+                    value="{{ old('tgl_transaksi', \Carbon\Carbon::parse($logObat->tgl_transaksi)->format('Y-m-d')) }}"
+                    class="form-input w-full" required>
             </div>
 
+            {{-- Tanggal Kadaluarsa --}}
             <div class="mb-4">
-                <label for="satuan">Satuan</label>
-                <input type="text" name="satuan" value="{{ old('satuan', $obat->satuan) }}" class="form-input w-full">
+                <label for="expired_at" class="block text-sm font-medium text-gray-700">Tanggal Kadaluarsa</label>
+                <input type="date" name="expired_at" id="expired_at"
+                    value="{{ old('expired_at', \Carbon\Carbon::parse($logObat->expired_at)->format('Y-m-d')) }}"
+                    class="form-input w-full" required>
             </div>
 
-            <div class="mb-4">
-                <label for="created_at">Tanggal Input</label>
-                <input type="text" value="{{ \Carbon\Carbon::parse($obat->created_at)->format('d-m-Y H:i') }}"
-                    class="form-input w-full bg-gray-100 cursor-not-allowed" readonly>
+            <div class="flex gap-2 mt-4">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    💾 Update Batch
+                </button>
+                <a href="{{ route('obat.detail', $logObat->obat_id) }}"
+                    class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">← Kembali</a>
             </div>
-
-            <div class="mb-4">
-                <label for="expired_at">Tanggal Kadaluarsa</label>
-                <input type="date" name="expired_at"
-                    value="{{ old('expired_at', \Carbon\Carbon::parse($obat->expired_at)->format('Y-m-d')) }}"
-                    class="form-input w-full">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Update</button>
-            <a href="{{ route('obat.index') }}" class="btn btn-secondary">Batal</a>
         </form>
     </div>
 @endsection

@@ -13,18 +13,24 @@ class ObatController extends Controller
     {
         $search = $request->input('search');
 
-        $obats = Obat::query()
-            ->when(
-                $search,
-                fn($query) =>
-                $query->where('nama_obat', 'like', '%' . $search . '%')
-            )
+        $obats = Obat::with('logObat') // Eager load log_obat agar tidak null
+            ->when($search, function ($query) use ($search) {
+                $query->where('nama_obat', 'like', '%' . $search . '%');
+            })
             ->orderBy('nama_obat')
             ->paginate(10)
             ->appends(['search' => $search]);
 
         return view('paramedis.obat.index', compact('obats', 'search'));
     }
+
+
+    public function showDetail($id)
+    {
+        $obat = Obat::with('logObat')->findOrFail($id);
+        return view('paramedis.obat.detail', compact('obat'));
+    }
+
 
     // ✅ Tampilkan form tambah obat
     public function create()
@@ -39,12 +45,13 @@ class ObatController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'id_obat'      => 'required|exists:obat,id',
-            'jenis_obat'  => 'required|string|max:255',
+            'id_obat'     => 'required|exists:obat,id',
+            // 'jenis_obat'  => 'required|string|max:255',
             'stok'        => 'required|integer|min:0',
-            'satuan'      => 'required|string|max:50',
+            // 'satuan'      => 'required|string|max:50',
             'expired_at'  => 'required|date',
         ]);
+
 
         $obat = Obat::findOrFail($request->id_obat);
 
@@ -54,8 +61,8 @@ class ObatController extends Controller
         // Update stok dan expired jika perlu
         $obat->update([
             'stok'       => $stokBaru,
-            'jenis_obat' => $request->jenis_obat,
-            'satuan'     => $request->satuan,
+            // 'jenis_obat' => $request->jenis_obat,
+            // 'satuan'     => $request->satuan,
             'expired_at' => $request->expired_at,
         ]);
 
@@ -82,14 +89,13 @@ class ObatController extends Controller
         return view('paramedis.obat.edit', compact('obat', 'jenis_obats'));
     }
 
-    // ✅ Update data obat & catat mutasi jika stok berubah
     public function update(Request $request, $id)
     {
         $request->validate([
             'nama_obat'   => 'required|string|max:255',
-            'jenis_obat'  => 'required|string|max:255',
+            // 'jenis_obat'  => 'required|string|max:255',
             'stok'        => 'required|integer|min:0',
-            'satuan'      => 'required|string|max:50',
+            // 'satuan'      => 'required|string|max:50',
             'expired_at'  => 'required|date',
         ]);
 
@@ -97,15 +103,16 @@ class ObatController extends Controller
         $stokLama = $obat->stok;
         $stokBaru = $request->stok;
 
+        // ✅ Update data
         $obat->update($request->only([
             'nama_obat',
-            'jenis_obat',
+            // 'jenis_obat',
             'stok',
-            'satuan',
+            // 'satuan',
             'expired_at'
         ]));
 
-        // Catat log jika stok berubah
+        // ✅ Catat mutasi stok jika berubah
         if ($stokLama !== $stokBaru) {
             $jenisMutasi = $stokBaru > $stokLama ? 'masuk' : 'keluar';
             $jumlahMutasi = abs($stokBaru - $stokLama);
@@ -116,16 +123,18 @@ class ObatController extends Controller
                 'jumlah'        => $jumlahMutasi,
                 'stok_awal'     => $stokLama,
                 'sisa_stok'     => $stokBaru,
-                'tgl_transaksi' => now(),
-                // 'expired_at' => $obat->expired_at, // aktifkan jika tersedia
+                'tgl_transaksi' => now()->timezone('Asia/Jakarta'),
                 'keterangan'    => 'Penyesuaian stok saat edit',
                 'ref_type'      => 'obat',
                 'ref_id'        => $obat->id,
             ]);
         }
 
-        return redirect()->route('obat.index')->with('success', 'Data obat berhasil diperbarui.');
+        return redirect()->route('obat.index')->with('success', '✅ Data obat berhasil diperbarui.');
     }
+
+
+
     public function formObatBaru()
     {
         return view('paramedis.obat.baru'); // asumsi file view-nya adalah create.blade.php
@@ -161,5 +170,18 @@ class ObatController extends Controller
         ]);
 
         return redirect()->route('obat.index')->with('success', 'Obat baru berhasil ditambahkan.');
+    }
+
+    public function destroy($id)
+    {
+        $obat = Obat::findOrFail($id);
+
+        // Hapus relasi batch terlebih dahulu, misal log_obat
+        $obat->logObat()->delete();
+
+        // Hapus master obat
+        $obat->delete();
+
+        return redirect()->route('obat.index')->with('success', 'Obat berhasil dihapus beserta seluruh batch-nya.');
     }
 }

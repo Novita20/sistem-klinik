@@ -29,6 +29,7 @@ use App\Http\Controllers\ResepObatController;
 use App\Http\Controllers\RestockObatController;
 use App\Http\Controllers\SdmLaporanObatController;
 use App\Http\Controllers\SdmRekamMedisController;
+use App\Http\Controllers\StokObatController;
 
 // ========================
 // 🏠 HALAMAN AWAL
@@ -160,17 +161,37 @@ Route::middleware('auth')->group(function () {
     Route::delete('/rekammedis/{id}', [ParamedisRekamMedisController::class, 'destroy'])->name('paramedis.rekammedis.destroy');
     Route::get('/rekammedis/{id}/pdf', [ParamedisRekamMedisController::class, 'downloadPDF'])->name('paramedis.rekammedis.pdf');
 
-    //INPUT OBAT
 
+    // =======================
+    // ROUTE UNTUK OBAT MASTER
+    // =======================
+
+    // Tampilkan ringkasan data obat + total stok + jumlah batch
     Route::get('/obat', [ObatController::class, 'index'])->name('obat.index');
+
+    // Form tambah obat baru ke tabel master (bukan stok)
     Route::get('/obat/create', [ObatController::class, 'create'])->name('obat.create');
-    Route::get('/obat/{id}/edit', [ObatController::class, 'edit'])->name('obat.edit');
     Route::post('/obat', [ObatController::class, 'store'])->name('obat.store');
 
-    //tambah obat baru
-    Route::get('/obat/input', [ObatController::class, 'create'])->name('obat.input'); // untuk tambah stok
-    Route::get('/obat/baru', [ObatController::class, 'formObatBaru'])->name('obat.baru'); // untuk obat baru
-    Route::post('/obat/baru', [ObatController::class, 'storeObatBaru'])->name('obat.storeBaru');
+    // Route::post('/obat/baru', [ObatController::class, 'storeObatBaru'])->name('obat.storeBaru');
+
+    // Tampilkan detail batch stok untuk satu obat (lihat daftar batch)
+    Route::get('/obat/{id}/detail', [ObatController::class, 'showDetail'])->name('obat.detail');
+    Route::delete('/obat/{id}', [ObatController::class, 'destroy'])->name('obat.destroy');
+
+    // =======================
+    // ROUTE UNTUK STOK OBAT PER BATCH
+    // =======================
+
+    // Form untuk tambah stok obat per batch (dengan dropdown nama obat)
+    Route::get('/stokobat/create', [StokObatController::class, 'create'])->name('stokobat.create');
+
+    // Simpan stok batch baru
+    Route::post('/stokobat/store', [StokObatController::class, 'store'])->name('stokobat.store');
+
+    // Edit stok batch
+    Route::get('/stokobat/{id}/edit', [StokObatController::class, 'edit'])->name('stokobat.edit');
+    Route::put('/stokobat/{id}', [StokObatController::class, 'update'])->name('stokobat.update');
 
 
     //MUTASI OBAT
