@@ -13,16 +13,25 @@ class ObatController extends Controller
     {
         $search = $request->input('search');
 
-        $obats = Obat::with('logObat') // Eager load log_obat agar tidak null
+        $obats = Obat::with('logObat') // Eager load log_obat
             ->when($search, function ($query) use ($search) {
                 $query->where('nama_obat', 'like', '%' . $search . '%');
             })
             ->orderBy('nama_obat')
-            ->paginate(10)
-            ->appends(['search' => $search]);
+            ->get();
+
+        // ✅ Hitung stok dinamis dari log_obat
+        $obats = $obats->map(function ($obat) {
+            $masuk = $obat->logObat->where('jenis_mutasi', 'masuk')->sum('jumlah');
+            $keluar = $obat->logObat->where('jenis_mutasi', 'keluar')->sum('jumlah');
+            $obat->total_stok = $masuk - $keluar;
+            $obat->jumlah_batch = $obat->logObat->count();
+            return $obat;
+        });
 
         return view('paramedis.obat.index', compact('obats', 'search'));
     }
+
 
 
     public function showDetail($id)
@@ -46,40 +55,55 @@ class ObatController extends Controller
     {
         $request->validate([
             'id_obat'     => 'required|exists:obat,id',
-            // 'jenis_obat'  => 'required|string|max:255',
             'stok'        => 'required|integer|min:0',
-            // 'satuan'      => 'required|string|max:50',
             'expired_at'  => 'required|date',
         ]);
 
-
         $obat = Obat::findOrFail($request->id_obat);
 
-        $stokLama = $obat->stok;
-        $stokBaru = $stokLama + $request->stok;
+        // Ambil stok terakhir dari batch dengan expired_at yang sama
+        $stokSebelumnya = LogObat::where('obat_id', $obat->id)
+            ->where('expired_at', $request->expired_at)
+            ->orderByDesc('tgl_transaksi')
+            ->first();
 
-        // Update stok dan expired jika perlu
-        $obat->update([
-            'stok'       => $stokBaru,
-            // 'jenis_obat' => $request->jenis_obat,
-            // 'satuan'     => $request->satuan,
-            'expired_at' => $request->expired_at,
-        ]);
+        $stokAwal = $stokSebelumnya ? $stokSebelumnya->sisa_stok : 0;
+        $sisaStokBaru = $stokAwal + $request->stok;
 
+        // ✅ Simpan log mutasi masuk
         LogObat::create([
             'obat_id'       => $obat->id,
             'jenis_mutasi'  => 'masuk',
             'jumlah'        => $request->stok,
-            'stok_awal'     => $stokLama,
-            'sisa_stok'     => $stokBaru,
+            'stok_awal'     => $stokAwal,
+            'sisa_stok'     => $sisaStokBaru,
+            'expired_at'    => $request->expired_at,
             'tgl_transaksi' => now(),
             'keterangan'    => 'Penambahan stok dari form input',
             'ref_type'      => 'obat',
             'ref_id'        => $obat->id,
         ]);
 
+        // ✅ Hitung ulang total stok dari seluruh batch mutasi masuk - keluar
+        $stokMasuk = LogObat::where('obat_id', $obat->id)
+            ->where('jenis_mutasi', 'masuk')
+            ->sum('jumlah');
+
+        $stokKeluar = LogObat::where('obat_id', $obat->id)
+            ->where('jenis_mutasi', 'keluar')
+            ->sum('jumlah');
+
+        $stokFinal = $stokMasuk - $stokKeluar;
+
+        // ✅ Update kolom `obat.stok` sesuai hasil total log
+        $obat->update([
+            'stok'       => max(0, $stokFinal),
+            'expired_at' => $request->expired_at, // opsional: bisa dikosongkan jika tiap batch berbeda
+        ]);
+
         return redirect()->route('obat.index')->with('success', 'Data obat berhasil disimpan.');
     }
+
 
     // ✅ Tampilkan form edit
     public function edit($id)

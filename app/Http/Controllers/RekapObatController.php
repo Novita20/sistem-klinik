@@ -18,21 +18,27 @@ class RekapObatController extends Controller
         $start = $request->input('start_date') ? Carbon::parse($request->input('start_date'))->startOfDay() : null;
         $end = $request->input('end_date') ? Carbon::parse($request->input('end_date'))->endOfDay() : null;
 
-        $data = Obat::with(['logObat' => function ($query) use ($start, $end) {
+        $obatQuery = Obat::whereHas('logObat');
+
+        $obatQuery->with(['logObat' => function ($query) use ($start, $end) {
             if ($start && $end) {
                 $query->whereBetween('tgl_transaksi', [$start, $end]);
             }
-        }])->get()->map(function ($obat) use ($start, $end) {
+        }]);
+
+        $obats = $obatQuery->get();
+
+        $data = $obats->map(function ($obat) {
             $logMasuk = $obat->logObat->where('jenis_mutasi', 'masuk');
             $logKeluar = $obat->logObat->where('jenis_mutasi', 'keluar');
 
             return [
                 'nama_obat' => $obat->nama_obat,
-                'stok' => $obat->stok,
                 'total_masuk' => $logMasuk->sum('jumlah'),
                 'total_keluar' => $logKeluar->sum('jumlah'),
+                'stok' => $logMasuk->sum('jumlah') - $logKeluar->sum('jumlah'),
                 'frekuensi' => $logKeluar->count(),
-                'terakhir_digunakan' => $logKeluar->sortByDesc('tgl_transaksi')->first()?->tgl_transaksi,
+                'terakhir_digunakan' => optional($logKeluar->sortByDesc('tgl_transaksi')->first())->tgl_transaksi,
             ];
         });
 

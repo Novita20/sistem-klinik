@@ -81,21 +81,21 @@ class ResepObatController extends Controller
         ]);
 
         // ✅ Kurangi stok obat
-        $stokAwal = $obat->stok;
-        $obat->stok -= $request->jumlah;
-        $obat->save();
+        // $stokAwal = $obat->stok;
+        // $obat->stok -= $request->jumlah;
+        // $obat->save();
 
-        LogObat::create([
-            'obat_id'       => $obat->id,
-            'jenis_mutasi'  => 'keluar',
-            'jumlah'        => $request->jumlah,
-            'stok_awal'     => $stokAwal,
-            'sisa_stok'     => $obat->stok,
-            'tgl_transaksi' => now(),
-            'keterangan'    => 'Pemberian obat ke pasien oleh paramedis',
-            'ref_type'      => 'resep',
-            'ref_id'        => $resep->id,
-        ]);
+        // LogObat::create([
+        //     'obat_id'       => $obat->id,
+        //     'jenis_mutasi'  => 'keluar',
+        //     'jumlah'        => $request->jumlah,
+        //     // 'stok_awal'     => $stokAwal,
+        //     'sisa_stok'     => $obat->stok,
+        //     'tgl_transaksi' => now(),
+        //     'keterangan'    => 'Pemberian obat ke pasien oleh paramedis',
+        //     'ref_type'      => 'resep',
+        //     'ref_id'        => $resep->id,
+        // ]);
 
         optional($rekamMedis->kunjungan)->update(['status' => 'selesai']);
 
@@ -155,13 +155,15 @@ class ResepObatController extends Controller
         return view('pasien.resep', compact('resepObat'));
     }
 
-    // Opsional: Kalau mau pisahkan aksi "berikan obat" dari create
+
+
+
     public function berikanObat($id)
     {
-        // Ambil data resep dan relasi obat
+
         $resep = ResepObat::with('obat')->findOrFail($id);
 
-        // Cegah jika obat sudah diberikan sebelumnya
+
         if ($resep->status_diberikan) {
             return redirect()->back()->with('warning', 'Obat sudah diberikan sebelumnya.');
         }
@@ -189,7 +191,6 @@ class ResepObatController extends Controller
             'obat_id'      => $obat->id,
             'jenis_mutasi' => 'keluar',
             'jumlah'       => $resep->jumlah,
-            'stok_awal'    => $stokAwal,       // Nilai sebelum dikurangi
             'sisa_stok'    => $obat->stok,     // Nilai setelah dikurangi
             'tgl_transaksi' => now(),
             // 'expired_at'   => $obat->expired_at,
@@ -199,5 +200,15 @@ class ResepObatController extends Controller
         ]);
 
         return redirect()->route('paramedis.resep.index')->with('success', 'Obat berhasil diberikan & dicatat.');
+    }
+
+
+    public function resetStatusDiberikan($id)
+    {
+        $resep = ResepObat::findOrFail($id);
+        $resep->status_diberikan = false;
+        $resep->save();
+
+        return redirect()->back()->with('success', 'Status resep berhasil direset untuk pengujian.');
     }
 }

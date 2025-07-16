@@ -156,7 +156,7 @@
     <div class="row">
         @php
             $menusObat = [
-                ['icon' => 'bi-box-seam', 'title' => 'Input Obat', 'route' => route('obat.input'), 'color' => 'info'],
+                ['icon' => 'bi-box-seam', 'title' => 'Input Obat', 'route' => route('obat.index'), 'color' => 'info'],
                 [
                     'icon' => 'bi-arrow-left-right',
                     'title' => 'Mutasi Obat',

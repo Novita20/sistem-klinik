@@ -24,6 +24,7 @@
                     <tr>
                         <th class="py-2 px-4 border">No</th>
                         <th class="py-2 px-4 border">Stok</th>
+                        <th class="py-2 px-4 border">Jenis Mutasi</th>
                         <th class="py-2 px-4 border">Tanggal Input</th>
                         <th class="py-2 px-4 border">Tanggal Kadaluarsa</th>
                         <th class="py-2 px-4 border">Aksi</th>
@@ -34,6 +35,7 @@
                         <tr class="hover:bg-gray-50">
                             <td class="py-2 px-4 border">{{ $index + 1 }}</td>
                             <td class="py-2 px-4 border">{{ $batch->jumlah }}</td>
+                            <td class="py-2 px-4 border">{{ ucfirst($batch->jenis_mutasi) }}</td>
                             <td class="py-2 px-4 border">{{ \Carbon\Carbon::parse($batch->tgl_transaksi)->format('d-m-Y') }}
                             </td>
                             <td class="py-2 px-4 border">

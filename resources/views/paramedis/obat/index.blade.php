@@ -33,13 +33,20 @@
                 </thead>
                 <tbody>
                     @forelse ($obats as $index => $obat)
-                        {{-- Tampilkan hanya jika ada batch (log_obat) --}}
+                        {{-- Tampilkan hanya jika ada log mutasi --}}
                         @if ($obat->logObat->isNotEmpty())
+                            @php
+                                $stokMasuk = $obat->logObat->where('jenis_mutasi', 'masuk')->sum('jumlah');
+                                $stokKeluar = $obat->logObat->where('jenis_mutasi', 'keluar')->sum('jumlah');
+                                $totalStok = $stokMasuk - $stokKeluar;
+                            @endphp
+
                             <tr class="hover:bg-gray-50">
-                                <td class="py-2 px-4 border">{{ $obats->firstItem() + $index }}</td>
+                                <td class="py-2 px-4 border">{{ $index + 1 }}
+                                </td>
                                 <td class="py-2 px-4 border">{{ $obat->nama_obat }}</td>
-                                <td class="py-2 px-4 border">{{ $obat->logObat->sum('jumlah') }}</td> {{-- Jumlah total stok dari log_obat --}}
-                                <td class="py-2 px-4 border">{{ $obat->logObat->count() }}</td> {{-- Jumlah batch --}}
+                                <td class="py-2 px-4 border">{{ $totalStok }}</td> {{-- ✅ Stok akhir yang benar --}}
+                                <td class="py-2 px-4 border">{{ $obat->logObat->count() }}</td> {{-- Jumlah batch / mutasi --}}
                                 <td class="py-2 px-4 border flex gap-2">
                                     <a href="{{ route('obat.detail', $obat->id) }}" class="text-blue-500 hover:underline">🔍
                                         Detail</a>
@@ -51,7 +58,6 @@
                                         <button type="submit" class="text-red-500 hover:underline">🗑️ Hapus</button>
                                     </form>
                                 </td>
-
                             </tr>
                         @endif
                     @empty
@@ -62,6 +68,7 @@
                         </tr>
                     @endforelse
                 </tbody>
+
 
             </table>
         </div>

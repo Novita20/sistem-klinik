@@ -47,21 +47,44 @@
                                         : '-' }}
                                 </td>
                                 <td class="border px-4 py-2">
-                                    {{-- ✅ Tombol Berikan --}}
+                                    {{-- ✅ Tombol Berikan & Reset --}}
                                     @if (!$resep->status_diberikan)
-                                        <form action="{{ route('paramedis.resep.berikan', ['id' => $resep->id]) }}"
-                                            method="POST" style="display:inline-block;"
-                                            onsubmit="return confirm('Yakin ingin memberikan obat ini?');">
-                                            @csrf
-                                            <button type="submit"
-                                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm"
-                                                style="z-index:1; position:relative;">
-                                                Berikan
-                                            </button>
-                                        </form>
+                                        <div class="flex flex-col items-center gap-1">
+                                            {{-- 🔵 Tombol Berikan --}}
+                                            <form action="{{ route('paramedis.resep.berikan', ['id' => $resep->id]) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Yakin ingin memberikan obat ini?');">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm w-full">
+                                                    Berikan
+                                                </button>
+                                            </form>
+
+                                            {{-- ⚪ Tombol Reset Status --}}
+                                            <form action="{{ route('resep.reset', $resep->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs w-full">
+                                                    Reset Status
+                                                </button>
+                                            </form>
+                                        </div>
                                     @else
-                                        <span class="text-green-600 font-semibold text-sm">✅ Sudah Diberikan</span>
+                                        <div class="flex flex-col items-center gap-1">
+                                            <span class="text-green-600 font-semibold text-sm">✅ Sudah Diberikan</span>
+
+                                            {{-- Optional: tombol reset meski sudah diberikan (untuk pengujian cepat) --}}
+                                            <form action="{{ route('resep.reset', $resep->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit"
+                                                    class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-xs mt-1 w-full">
+                                                    Reset Status
+                                                </button>
+                                            </form>
+                                        </div>
                                     @endif
+
 
                                     {{-- ✅ Tombol Edit & Hapus --}}
                                     <div class="flex justify-center space-x-2 mt-2">

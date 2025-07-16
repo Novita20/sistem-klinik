@@ -37,13 +37,16 @@
                             class="form-input rounded px-3 py-1 border w-44" />
                     </div>
 
-
-                    <div>
+                    <div class="flex gap-2 mt-5">
                         <button type="submit"
-                            class="mt-5 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Terapkan</button>
+                            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Terapkan</button>
+
+                        <a href="{{ route('obat.rekap') }}"
+                            class="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400">Reset</a>
                     </div>
                 </form>
             </div>
+
 
             <table class="table-auto w-full border text-sm">
                 <thead class="bg-gray-100">
@@ -69,6 +72,7 @@
                             <td class="px-4 py-2 border">
                                 {{ $obat['terakhir_digunakan'] ? \Carbon\Carbon::parse($obat['terakhir_digunakan'])->format('d-m-Y') : '-' }}
                             </td>
+
                         </tr>
                     @empty
                         <tr>

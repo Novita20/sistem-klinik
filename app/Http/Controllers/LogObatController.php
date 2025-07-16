@@ -14,6 +14,7 @@ class LogObatController extends Controller
     {
         $search = $request->input('search');
 
+        // 🔍 Ambil semua log obat + relasi obat & resep
         $logObat = LogObat::with(['obat', 'resep'])
             ->when($search, function ($query) use ($search) {
                 $query->whereHas('obat', function ($q) use ($search) {
@@ -32,29 +33,34 @@ class LogObatController extends Controller
                     });
             })
             ->orderBy('tgl_transaksi')
-            ->get(); // Ambil semua dulu untuk hitung stok
+            ->orderBy('id') // untuk menghindari duplikasi data di tanggal sama
+            ->get();
 
-        // 💡 Hitung stok_awal dan sisa_stok berdasarkan expired_at
-        $grouped = $logObat->groupBy(function ($item) {
-            return $item->obat_id . '|' . $item->expired_at;
-        });
+        // ✅ Hitung stok awal dan sisa stok per obat (global, tidak per expired_at)
+        $stokTotalPerObat = [];
 
-        foreach ($grouped as $group) {
-            $stokSisa = 0;
-            foreach ($group as $log) {
-                $log->stok_awal = $stokSisa;
+        foreach ($logObat as $log) {
+            $obatId = $log->obat_id;
 
-                if ($log->jenis_mutasi === 'masuk') {
-                    $stokSisa += $log->jumlah;
-                } else {
-                    $stokSisa -= $log->jumlah;
-                }
-
-                $log->sisa_stok = max(0, $stokSisa); // Tambahkan properti manual
+            // Inisialisasi jika belum ada
+            if (!isset($stokTotalPerObat[$obatId])) {
+                $stokTotalPerObat[$obatId] = 0;
             }
+
+            // Hitung stok_awal berdasarkan total stok sebelum transaksi ini
+            $log->stok_awal = $stokTotalPerObat[$obatId];
+
+            // Hitung sisa stok setelah transaksi
+            if ($log->jenis_mutasi === 'masuk') {
+                $stokTotalPerObat[$obatId] += $log->jumlah;
+            } elseif ($log->jenis_mutasi === 'keluar') {
+                $stokTotalPerObat[$obatId] -= $log->jumlah;
+            }
+
+            $log->sisa_stok = max(0, $stokTotalPerObat[$obatId]); // Tidak boleh negatif
         }
 
-        // 💡 Paginate secara manual karena sudah get() di atas
+        // ✅ Pagination manual (karena data sudah get)
         $page = $request->input('page', 1);
         $perPage = 10;
         $paged = $logObat->forPage($page, $perPage);
@@ -66,8 +72,11 @@ class LogObatController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        return view('paramedis.mutasi.index', ['logObat' => $logObatPaginated]);
+        return view('paramedis.mutasi.index', [
+            'logObat' => $logObatPaginated
+        ]);
     }
+
 
     // ✏️ Menampilkan form edit mutasi
     public function editLog($id)

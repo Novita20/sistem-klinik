@@ -140,6 +140,8 @@ Route::middleware('auth')->group(function () {
     Route::put('/paramedis/resep/{id}', [ResepObatController::class, 'update'])->name('paramedis.resep.update');
     Route::get('/paramedis/resep/create', [ResepObatController::class, 'create'])->name('paramedis.resep.create');
     Route::post('/resep-obat/berikan/{id}', [ResepObatController::class, 'berikanObat'])->name('paramedis.resep.berikan');
+    Route::post('/resep/reset-diberikan/{id}', [ResepObatController::class, 'resetStatusDiberikan'])->name('resep.reset');
+
 
     // Route::post('/resep/{id}/berikan', [ObatController::class, 'berikanObat'])->name('resep.berikan');
 
