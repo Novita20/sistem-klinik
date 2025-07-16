@@ -91,19 +91,42 @@
                 <p class="font-bold text-blue-800 text-xl">+62 812 3456 7890</p>
             </div>
 
-            <!-- Janji Temu -->
-            <div class="border p-6 rounded-2xl shadow text-center bg-white">
-                <i class="fas fa-calendar-check text-3xl text-green-500 mb-3"></i>
-                <h5 class="font-semibold text-lg mb-3">Buat Janji Temu</h5>
-                <form>
-                    <input type="text" class="form-input w-full mb-2" placeholder="Nama">
-                    <input type="tel" class="form-input w-full mb-2" placeholder="Nomor HP">
-                    <select class="form-select w-full mb-2">
-                        <option>Pilih Dokter</option>
-                    </select>
-                    <button class="btn btn-primary w-full">Buat Janji</button>
-                </form>
+            <!-- Info Kesehatan (Pengganti Janji Temu) -->
+            <div class="border p-6 rounded-2xl shadow text-center bg-white relative overflow-hidden">
+                <i class="fas fa-heartbeat text-3xl text-red-500 mb-3 animate-pulse"></i>
+                <h5 class="font-semibold text-lg mb-4">💬 Kutipan Kesehatan</h5>
+
+                <!-- Container untuk kutipan -->
+                <div id="quote-slider" class="text-sm text-blue-700 italic transition-opacity duration-500 ease-in-out">
+                    "Sehat bukan segalanya, tapi tanpa sehat segalanya tak berarti."
+                </div>
             </div>
+
+            <!-- JS untuk slide quote -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const quotes = [
+                        "Sehat bukan segalanya, tapi tanpa sehat segalanya tak berarti.",
+                        "Mencegah lebih baik daripada mengobati.",
+                        "Tubuh yang sehat adalah rumah bagi jiwa yang kuat.",
+                        "Minum air putih cukup bantu tubuh tetap bugar.",
+                        "Tidur cukup adalah bentuk perawatan diri paling sederhana."
+                    ];
+
+                    let index = 0;
+                    const quoteElement = document.getElementById('quote-slider');
+
+                    setInterval(() => {
+                        quoteElement.style.opacity = 0;
+                        setTimeout(() => {
+                            index = (index + 1) % quotes.length;
+                            quoteElement.textContent = quotes[index];
+                            quoteElement.style.opacity = 1;
+                        }, 400); // transisi keluar sebelum masuk
+                    }, 5000); // setiap 5 detik
+                });
+            </script>
+
         </div>
     </div>
     <!-- Galeri Foto -->
@@ -153,7 +176,7 @@
             [
                 'judul' => 'Makanan Sehat untuk Jantung',
                 'isi' => 'Perhatikan nutrisi untuk menjaga kesehatan jantung Anda. Konsumsi makanan rendah lemak, tinggi serat, dan hindari makanan olahan.',
-                'link' => null,
+                'link' => 'https://www.halodoc.com/artikel/6-makanan-sehat-untuk-menjaga-kesehatan-jantung',
             ],
         ] as $artikel)
                     <div class="bg-white p-6 rounded-xl shadow hover:shadow-lg transition">
@@ -170,44 +193,42 @@
                     </div>
                 @endforeach
             </div>
-        </div>
-    </div>
 
 
 
-    <!-- Lokasi Klinik -->
-    <div class="bg-white py-16">
-        <div class="max-w-6xl mx-auto px-4 text-center">
-            <h2 class="text-2xl font-bold mb-6">Lokasi Klinik PLN NP Paiton</h2>
-            <p class="text-gray-600 mb-6">Kunjungi kami langsung di lokasi kami untuk pelayanan terbaik.</p>
+            <!-- Lokasi Klinik -->
+            <div class="bg-white py-16">
+                <div class="max-w-6xl mx-auto px-4 text-center">
+                    <h2 class="text-2xl font-bold mb-6">Lokasi Klinik PLN NP Paiton</h2>
+                    <p class="text-gray-600 mb-6">Kunjungi kami langsung di lokasi kami untuk pelayanan terbaik.</p>
 
-            <div class="w-full h-[400px] rounded-xl overflow-hidden shadow-lg">
-                <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3953.261146230578!2d113.43136947416485!3d-7.763569476948276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd6d35d9b69ad4b%3A0xd0d72cc086d9753!2sPLN%20Nusantara%20Power%20UP%20Paiton!5e0!3m2!1sid!2sid!4v1720584001234!5m2!1sid!2sid"
-                    width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade">
-                </iframe>
+                    <div class="w-full h-[400px] rounded-xl overflow-hidden shadow-lg">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3953.261146230578!2d113.43136947416485!3d-7.763569476948276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd6d35d9b69ad4b%3A0xd0d72cc086d9753!2sPLN%20Nusantara%20Power%20UP%20Paiton!5e0!3m2!1sid!2sid!4v1720584001234!5m2!1sid!2sid"
+                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
 
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                new Swiper('.swiper', {
-                    loop: true,
-                    autoplay: {
-                        delay: 3000,
-                        disableOnInteraction: false,
-                    },
-                    pagination: {
-                        el: '.swiper-pagination',
-                        clickable: true,
-                    },
-                });
-            });
-        </script>
-    @endpush
+            @push('scripts')
+                <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        new Swiper('.swiper', {
+                            loop: true,
+                            autoplay: {
+                                delay: 3000,
+                                disableOnInteraction: false,
+                            },
+                            pagination: {
+                                el: '.swiper-pagination',
+                                clickable: true,
+                            },
+                        });
+                    });
+                </script>
+            @endpush
 
-@endsection
+        @endsection
