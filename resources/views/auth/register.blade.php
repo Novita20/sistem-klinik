@@ -66,10 +66,10 @@
                         <select name="role" class="form-control" required>
                             <option value="" disabled selected>Pilih Role</option>
                             <option value="pasien">Pasien</option>
-                            <option value="dokter">Dokter</option>
+                            {{-- <option value="dokter">Dokter</option>
                             <option value="paramedis">Paramedis</option>
                             <option value="sdm">SDM</option>
-                            <option value="k3">K3</option>
+                            <option value="k3">K3</option> --}}
                         </select>
                     </div>
 
