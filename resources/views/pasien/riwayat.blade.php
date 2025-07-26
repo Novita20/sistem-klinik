@@ -27,7 +27,7 @@
                             <th class="border px-3 py-2">No</th>
                             <th class="border px-3 py-2">Tanggal</th>
                             <th class="border px-3 py-2">Keluhan</th>
-                            <th class="border px-3 py-2">Dokter</th>
+                            {{-- <th class="border px-3 py-2">Dokter</th> --}}
                             <th class="border px-3 py-2">Status</th>
                         </tr>
                     </thead>
@@ -39,9 +39,9 @@
                                     {{ \Carbon\Carbon::parse($kunjungan->tgl_kunjungan ?? now())->timezone('Asia/Jakarta')->format('d-m-Y H:i') }}
                                 </td>
                                 <td class="border px-3 py-2">{{ $kunjungan->keluhan ?? '-' }}</td>
-                                <td class="border px-3 py-2 text-center">
+                                {{-- <td class="border px-3 py-2 text-center">
                                     {{ $kunjungan->rekamMedis && $kunjungan->rekamMedis->dokter ? $kunjungan->rekamMedis->dokter->name : '-' }}
-                                </td>
+                                </td> --}}
                                 <td class="border px-3 py-2 text-center">
                                     @php
                                         $status = $kunjungan->status ?? 'belum_ditangani';
